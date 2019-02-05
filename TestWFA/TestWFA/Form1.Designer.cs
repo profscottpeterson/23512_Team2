@@ -34,11 +34,13 @@
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.label1.Location = new System.Drawing.Point(109, 33);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(83, 13);
+            this.label1.Size = new System.Drawing.Size(102, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Change this text";
+            this.label1.Text = "This text is changed";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // Form1
             // 
