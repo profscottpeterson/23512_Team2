@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Media;
 using System.Windows.Threading;
+using System.IO;
+using Path = System.Windows.Shapes.Path;
 
 namespace Simon
 {
@@ -26,6 +28,7 @@ namespace Simon
         {
             InitializeComponent();
         }
+   
         // create media element.  We will set items from a list of media elements to this variable throughout the program
         MediaElement me = new MediaElement();
 
@@ -56,6 +59,14 @@ namespace Simon
         Color redPressed2 = Color.FromRgb(255, 0, 0);
         Color yellowPressed2 = Color.FromRgb(255, 255, 0);
         Color bluePressed2 = Color.FromRgb(0, 0, 255);
+
+        //slider values need to be global.  Their positions are accessed when the start button is pressed
+        int gameSliderPosition;
+        int skillLevelSliderPosition;
+        int powerSliderPosition;
+
+        // List used to fill with random paths for random sequence of lights
+        List<Path> randomPaths = new List<Path>();
 
         // window is loaded.  Create stuff
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -108,10 +119,31 @@ namespace Simon
             btnConfirmKeys.Height = 0;
             btnConfirmKeys.Width = 0;
 
+
+            if (File.Exists("saveFile.txt"))
+            {
+                // stream reader, read save file
+                StreamReader sr = new StreamReader("saveFile.txt");
+
+                string temp = "";
+                temp = sr.ReadLine();
+                gameSlider.Value = Int32.Parse(temp);
+                temp = sr.ReadLine();
+                skillLevelSlider.Value = Int32.Parse(temp);
+                temp = sr.ReadLine();
+                pwrSlider.Value = Int32.Parse(temp);
+
+                sr.Close();
+            }
+
+            // slider positions
+            gameSliderPosition = Convert.ToInt32(gameSlider.Value);
+            skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
+            powerSliderPosition = Convert.ToInt32(pwrSlider.Value);
         }
 
         // button is pressed
-        private void ButtonPressed(Path gameBoardButton)
+        private void ButtonPressed(System.Windows.Shapes.Path gameBoardButton)
         {
             // start timer
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
@@ -149,7 +181,7 @@ namespace Simon
         }
 
         // button is released - called in event handlers mouse hovers off, mouse unclicked, key press up
-        private void ButtonReleased(Path gameBoardButton)
+        private void ButtonReleased(System.Windows.Shapes.Path gameBoardButton)
         {
             if (gameBoardButton.Name == "buttonGreen")
             {
@@ -335,6 +367,116 @@ namespace Simon
         private void BtnConfirmKeys_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void GameSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+            gameSliderPosition = Convert.ToInt32(gameSlider.Value);
+            
+            //debug
+            //debugGameSlider.Content = "Game Slider Pos: " + gameSliderPosition.ToString();
+
+           // debugGameSlider.Content = "asdf";
+        }
+
+        private void SkillLevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
+
+            //debug
+            // debugSkillSlider.Content = "Skill Slider Pos: " + skillLevelSliderPosition.ToString();
+        }
+
+        private void PwrSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            powerSliderPosition = Convert.ToInt32(pwrSlider.Value);
+          
+            // game turned on
+            if (powerSliderPosition == 1)
+            {
+                // game is turned on
+                // make lights flash?
+                // Start inactivity countdown - game flashes  if left on for over 45s
+            }
+        }
+
+        
+
+        private void btnStartGame(object sender, MouseButtonEventArgs e)
+        {
+            // begin game
+
+            // generate random numbers for order
+
+            Random rand = new Random();
+
+            for (int i = 0; i < 35; i++)
+            {
+                Path p = new Path();
+
+                int tempRandom = rand.Next(0,4);
+
+                if(tempRandom==0)
+                {
+                    p=buttonGreen;
+                }
+
+                if (tempRandom == 1)
+                {
+                    p=buttonRed;
+                }
+
+                if (tempRandom == 2)
+                {
+                    p=buttonYellow;
+                }
+
+                if (tempRandom == 3)
+                {
+                    p=buttonBlue;
+                }
+
+                randomPaths.Add(p);
+
+            }
+
+        }
+
+        private void BtnSave_Click(object sender, RoutedEventArgs e)
+        {
+            // stream reader for reading/writing info
+            StreamWriter sw = new StreamWriter("saveFile.txt");
+
+            sw.WriteLine(gameSliderPosition.ToString());
+            sw.WriteLine(skillLevelSliderPosition.ToString());
+            sw.WriteLine(powerSliderPosition.ToString());
+            
+            sw.Flush();
+        }
+
+
+        // used to test sequence
+        int testsequence = -1;
+
+        DispatcherTimer testTime = new DispatcherTimer();
+
+        private void BtnTestSequence_Click(object sender, RoutedEventArgs e)
+        {
+            testsequence++;
+
+            testTime.Tick += new EventHandler(testTime_Tick);
+            testTime.Interval = new TimeSpan(0, 0, 0, 0, 250);
+            testTime.Start();
+
+            ButtonPressed(randomPaths[testsequence]);            
+        }
+
+        private void testTime_Tick(object sender, EventArgs e)
+        {
+            ButtonReleased(randomPaths[testsequence]);
+
+            testTime.Stop();
         }
     }
 }

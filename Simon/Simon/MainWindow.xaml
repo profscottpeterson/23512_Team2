@@ -67,9 +67,9 @@
             <Ellipse Fill="#FF111111" Height="385" Canvas.Left="229" Stroke="#FF111111" Canvas.Top="158" Width="385" StrokeThickness="1"/>
             <Ellipse x:Name="centerGray" Fill="Silver" Height="325" Canvas.Left="260" Stroke="Black" Canvas.Top="188" Width="324" StrokeThickness="1"/>
             <Label x:Name="GameTitle" Content="Generic Memory Game®" Canvas.Top="246" Height="42" Width="251" FontSize="20" FontWeight="Bold" Canvas.Left="298"/>
-            <Slider x:Name="pwrSlider" Cursor="Hand" Style="{DynamicResource PowerSlider}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="47" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="1" BorderBrush="#00000000" Foreground="Black" Canvas.Left="392" Canvas.Top="469" MinWidth="60"/>
-            <Slider x:Name="gameSlider" Cursor="Hand" Style="{DynamicResource GameSlider}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="72" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="3" BorderBrush="#00000000" Foreground="Black" Canvas.Left="310" Canvas.Top="347" MinWidth="60" Minimum="1"/>
-            <Slider x:Name="skillLevelSlider" Cursor="Hand" Style="{DynamicResource SkillSlider}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="134" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="4" BorderBrush="#00000000" Foreground="Black" Canvas.Left="418" Canvas.Top="347" MinWidth="60" Minimum="1"/>
+            <Slider x:Name="pwrSlider" Cursor="Hand" Style="{DynamicResource PowerSlider}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="47" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="1" BorderBrush="#00000000" Foreground="Black" Canvas.Left="392" Canvas.Top="469" MinWidth="60" ValueChanged="PwrSlider_ValueChanged"/>
+            <Slider x:Name="gameSlider" Cursor="Hand" Style="{DynamicResource GameSlider}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="72" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="3" BorderBrush="#00000000" Foreground="Black" Canvas.Left="310" Canvas.Top="347" MinWidth="60" Minimum="1" ValueChanged="GameSlider_ValueChanged"/>
+            <Slider x:Name="skillLevelSlider" Cursor="Hand" Style="{DynamicResource SkillSlider}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="134" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="4" BorderBrush="#00000000" Foreground="Black" Canvas.Left="418" Canvas.Top="347" MinWidth="60" Minimum="1" ValueChanged="SkillLevelSlider_ValueChanged"/>
             <Label x:Name="gameSliderLabel" Content="GAME" Canvas.Top="325" Height="22" Width="40" Canvas.Left="326" FontSize="10"/>
             <Label x:Name="gameSliderLabelNumbers" Content="1  2  3" Canvas.Top="369" Height="22" Width="54" Canvas.Left="328" FontSize="10"/>
             <Label x:Name="skillSliderLabel" Content="SKILL LEVEL" Canvas.Top="325" Height="22" Width="64" Canvas.Left="453" FontSize="10"/>
@@ -78,9 +78,9 @@
             <Label x:Name="powerSliderLabelOn" Content="ON" Canvas.Top="469" Height="22" Width="40" Canvas.Left="450" FontSize="10"/>
             <Ellipse x:Name="btnLast" Cursor="Hand" Fill="Yellow" Height="26" Canvas.Left="328" Stroke="Black" StrokeThickness="2" Canvas.Top="414" Width="26"/>
             <Ellipse x:Name="btnLongest" Cursor="Hand" Fill="Yellow" Height="26" Canvas.Left="491" Stroke="Black" StrokeThickness="2" Canvas.Top="414" Width="26"/>
-            <Ellipse x:Name="btnStart" Cursor="Hand" Fill="Red" Height="26" Canvas.Left="410" Stroke="Black" StrokeThickness="2" Canvas.Top="414" Width="26"/>
+            <Ellipse x:Name="btnStart" Cursor="Hand" Fill="Red" Height="26" Canvas.Left="409" Stroke="Black" StrokeThickness="2" Canvas.Top="414" Width="26" MouseUp="btnStartGame"/>
             <Label x:Name="btnLastLabel" Content="LAST" Canvas.Top="434" Height="22" Width="40" Canvas.Left="322" FontSize="10"/>
-            <Label x:Name="btnStartLabel" Content="START" Canvas.Top="434" Height="22" Width="40" Canvas.Left="403" FontSize="10"/>
+            <Label x:Name="btnStartLabel" Content="START" Canvas.Top="434" Height="22" Width="40" Canvas.Left="404" FontSize="10"/>
             <Label x:Name="btnLongestLabel" Content="LONGEST" Canvas.Top="434" Height="22" Width="55" Canvas.Left="479" FontSize="10"/>
         </Canvas>
         <Slider x:Name="VolSlider" HorizontalAlignment="Left" Margin="1085,475,0,0" VerticalAlignment="Top" Height="33" Width="70" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="3" BorderBrush="#00000000" Foreground="Black" ValueChanged="VolSlider_ValueChanged"/>
@@ -112,6 +112,8 @@
             </Menu>
             <StackPanel></StackPanel>
         </DockPanel>
+        <Button x:Name="btnSave" Content="Save Settings" HorizontalAlignment="Left" Margin="1052,668,0,0" VerticalAlignment="Top" Width="75" Click="BtnSave_Click"/>
+        <Button x:Name="btnTestSequence" Content="Test Sequence" HorizontalAlignment="Left" Margin="1048,746,0,0" VerticalAlignment="Top" Width="104" Height="46" Click="BtnTestSequence_Click"/>
     </Grid>
 
 
