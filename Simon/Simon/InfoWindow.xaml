@@ -1,0 +1,15 @@
+﻿<Window x:Class="Simon.InfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Simon"
+        mc:Ignorable="d"
+        Title="About" Height="250.074" Width="615.805" Loaded="info_loaded">
+    <Grid>
+        <Button x:Name="infoWindowClose" Content="Close" HorizontalAlignment="Left" Margin="248,174,0,0" VerticalAlignment="Top" Width="81" Click="InfoWindowClose_Click"/>
+        <TextBlock x:Name="textBlockGenInfo" HorizontalAlignment="Left" Margin="24,34,0,0" TextWrapping="Wrap" Text="Version 1.0 &#x0a;Created for Team Software Development &#x0a;Class #23512&#x0a;Spring 2019&#x0a;Northeast Wisconsin Technical College&#x0a;Green Bay, WI" VerticalAlignment="Top" Height="103" Width="262"/>
+        <TextBlock x:Name="textBlockDevNames" HorizontalAlignment="Left" Margin="315,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="103" Width="262" TextAlignment="Center"/>
+
+    </Grid>
+</Window>

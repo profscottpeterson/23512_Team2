@@ -58,6 +58,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InfoWindow.xaml.cs">
+      <DependentUpon>InfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="InfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -71,6 +81,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -108,6 +122,9 @@
     <Resource Include="Images\SkillSlider.png" />
     <Resource Include="Icon.ico" />
     <Resource Include="Images\Icon.ico" />
+    <Resource Include="Images\granite.jpg" />
+    <Resource Include="Images\OuterSpace.jpg" />
+    <Resource Include="Images\woodGrain.jpg" />
     <Content Include="Sounds\42hz_losing_tone.wav" />
     <Resource Include="Resources\Game instructions link.txt" />
     <Content Include="Sounds\209hz_green_g#3.wav" />

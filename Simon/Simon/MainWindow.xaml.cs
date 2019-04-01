@@ -71,6 +71,7 @@ namespace Simon
         // window is loaded.  Create stuff
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+           
             // get sounds from relative filepath and add to list of mediaElement objects
             MediaElement sound = new MediaElement();
             sound.Source = new Uri(@"../../Sounds/209hz_green_g#3.wav", UriKind.Relative);
@@ -477,6 +478,23 @@ namespace Simon
             ButtonReleased(randomPaths[testsequence]);
 
             testTime.Stop();
+        }
+
+      
+        //  open the settings window when clicked
+        private void settings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow settingsWindow = new SettingsWindow();
+            settingsWindow.Show();
+
+            
+        }
+
+        // open the info window when clicked
+        private void info_Click(object sender, RoutedEventArgs e)
+        {
+            InfoWindow infoWindow = new InfoWindow();
+            infoWindow.Show();
         }
     }
 }
