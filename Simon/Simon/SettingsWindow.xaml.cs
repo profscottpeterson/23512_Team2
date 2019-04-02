@@ -24,29 +24,61 @@ namespace Simon
             InitializeComponent();
         }
 
-        MainWindow mw = new MainWindow();
+        ImageBrush woodBrush = new ImageBrush();
+        ImageBrush graniteBrush = new ImageBrush();
+        ImageBrush spaceBrush = new ImageBrush();
+        SolidColorBrush rgbBrush = new SolidColorBrush();
 
-        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        private void settingsLoaded(object sender, RoutedEventArgs e)
         {
+            // set up pictures
+            Image woodImage = new Image();
+            woodImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/woodGrain.jpg"));
+            woodBrush.ImageSource = woodImage.Source;
+        
+            Image graniteImage = new Image();
+            graniteImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/granite.jpg"));
+            graniteBrush.ImageSource = graniteImage.Source;
 
-            
-
+            Image spaceImage = new Image();
+            spaceImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/OuterSpace.jpg"));
+            spaceBrush.ImageSource = spaceImage.Source;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+
+        private void rdoBtn_Checked(object sender, RoutedEventArgs e)
         {
-            ImageBrush myBrush = new ImageBrush();
-            Image image = new Image();
-            image.Source = new BitmapImage(
-                new Uri(
-                   "pack://application:,,,/Images/woodGrain.jpg"));
-            myBrush.ImageSource = image.Source;
+            if(rdoWood.IsChecked==true)
+            {
+                ((MainWindow)Application.Current.MainWindow).background.Background = woodBrush;
+            }
 
-            (mw as MainWindow).background.Background = myBrush;
+            if(rdoGranite.IsChecked==true)
+            {
+                ((MainWindow)Application.Current.MainWindow).background.Background = graniteBrush;
+            }
 
-           
+            if(rdoSpace.IsChecked==true)
+            {
+                ((MainWindow)Application.Current.MainWindow).background.Background = spaceBrush;
+            }
 
-            ((MainWindow)Application.Current.MainWindow).background.Background = myBrush;
+            if(rdoRGB.IsChecked==false)
+            {
+                rgbPanel.IsEnabled = false;
+            }
+
+            if(rdoRGB.IsChecked==true)
+            {
+                rgbPanel.IsEnabled = true;
+            }
+        }
+
+        private void ColorSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Color RGBBackground = Color.FromRgb(Convert.ToByte(slColorR.Value), Convert.ToByte(slColorG.Value), Convert.ToByte(slColorB.Value));
+            rgbBrush.Color = RGBBackground;
+            ((MainWindow)Application.Current.MainWindow).background.Background = rgbBrush;
         }
     }
 }

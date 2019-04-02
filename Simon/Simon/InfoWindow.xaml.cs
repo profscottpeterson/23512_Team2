@@ -72,7 +72,6 @@ namespace Simon
             textBlockDevNames.Text = textforTextbox;
         }
 
-
         // closes the window to get back to the game
         private void InfoWindowClose_Click(object sender, RoutedEventArgs e)
         {

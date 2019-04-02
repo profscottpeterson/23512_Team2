@@ -35,8 +35,11 @@ namespace Simon
         // list of media elements
         List<MediaElement> buttonSounds = new List<MediaElement>();
 
-        // timer to repeat events
-        DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        // timer to repeat button sounds when button is held
+        DispatcherTimer TimertoLoopBtnSounds = new DispatcherTimer();
+
+        // timer to change focus away from text field and set custom keys
+        DispatcherTimer timerToSetCustomKeys = new DispatcherTimer();
 
         // this list of keys.  User can set hot keys to press simon buttons instead of using mouse
         List<Key> buttonHotKeys = new List<Key>();
@@ -71,37 +74,11 @@ namespace Simon
         // window is loaded.  Create stuff
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-           
-            // get sounds from relative filepath and add to list of mediaElement objects
-            MediaElement sound = new MediaElement();
-            sound.Source = new Uri(@"../../Sounds/209hz_green_g#3.wav", UriKind.Relative);
-            sound.LoadedBehavior = MediaState.Manual;
-            sound.UnloadedBehavior = MediaState.Manual;
-            buttonSounds.Add(sound);
+            // call setup timers method
+            SetupTimers();
 
-            sound = new MediaElement();
-            sound.Source = new Uri(@"../../Sounds/252hz_red_b3.wav", UriKind.Relative);
-            sound.LoadedBehavior = MediaState.Manual;
-            sound.UnloadedBehavior = MediaState.Manual;
-            buttonSounds.Add(sound);
-
-            sound = new MediaElement();
-            sound.Source = new Uri(@"../../Sounds/310hz_yellow_d#4.wav", UriKind.Relative);
-            sound.LoadedBehavior = MediaState.Manual;
-            sound.UnloadedBehavior = MediaState.Manual;
-            buttonSounds.Add(sound);
-
-            sound = new MediaElement();
-            sound.Source = new Uri(@"../../Sounds/415hz_blue_g#4.wav", UriKind.Relative);
-            sound.LoadedBehavior = MediaState.Manual;
-            sound.UnloadedBehavior = MediaState.Manual;
-            buttonSounds.Add(sound);
-
-            sound = new MediaElement();
-            sound.Source = new Uri(@"../../Sounds/42hz_losing_tone.wav", UriKind.Relative);
-            sound.LoadedBehavior = MediaState.Manual;
-            sound.UnloadedBehavior = MediaState.Manual;
-            buttonSounds.Add(sound);
+            // call setup media elements method
+            SetupMediaElements();
 
             // create list of keys
             for (int i = 0; i < 4; i++)
@@ -109,6 +86,11 @@ namespace Simon
                 Key k = new Key();
                 buttonHotKeys.Add(k);
             }
+
+            buttonHotKeys[0] = Key.Q;
+            buttonHotKeys[1] = Key.W;
+            buttonHotKeys[2] = Key.A;
+            buttonHotKeys[3] = Key.S;
 
             // set positions of all controls
             VolSlider.Value = 2; // 66% sound
@@ -143,13 +125,12 @@ namespace Simon
             powerSliderPosition = Convert.ToInt32(pwrSlider.Value);
         }
 
-        // button is pressed
-        private void ButtonPressed(System.Windows.Shapes.Path gameBoardButton)
+        // button is pressed 
+        private void ButtonActivated(System.Windows.Shapes.Path gameBoardButton)
         {
             // start timer
-            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            dispatcherTimer.Start();
+           
+            TimertoLoopBtnSounds.Start();
 
             if (gameBoardButton.Name == "buttonGreen")
             {
@@ -182,44 +163,46 @@ namespace Simon
         }
 
         // button is released - called in event handlers mouse hovers off, mouse unclicked, key press up
-        private void ButtonReleased(System.Windows.Shapes.Path gameBoardButton)
+        private void ButtonDeactivated(System.Windows.Shapes.Path gameBoardButton)
         {
             if (gameBoardButton.Name == "buttonGreen")
             {
                 SolidColorBrush b = new SolidColorBrush(greenUnPressed);
                 gameBoardButton.Fill = b;
-                dispatcherTimer.Stop();
+                TimertoLoopBtnSounds.Stop();
             }
 
             if (gameBoardButton.Name == "buttonRed")
             {
                 SolidColorBrush b = new SolidColorBrush(redUnPressed);
                 gameBoardButton.Fill = b;
-                dispatcherTimer.Stop();
+                TimertoLoopBtnSounds.Stop();
             }
 
             if (gameBoardButton.Name == "buttonYellow")
             {
                 SolidColorBrush b = new SolidColorBrush(yellowUnPressed);
                 gameBoardButton.Fill = b;
-                dispatcherTimer.Stop();
+                TimertoLoopBtnSounds.Stop();
             }
 
             if (gameBoardButton.Name == "buttonBlue")
             {
                 SolidColorBrush b = new SolidColorBrush(blueUnPressed);
                 gameBoardButton.Fill = b;
-                dispatcherTimer.Stop();
+                TimertoLoopBtnSounds.Stop();
             }
             me.Stop();
         }
 
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        // When the button sound loop timer finishes, set the media's position and replay
+        private void TimertoLoopBtnSounds_Tick(object sender, EventArgs e)
         {
             me.Position = new TimeSpan(0, 0, 0, 0, 500);
             me.Play();
         }
 
+        // This sets the volume for all button sounds
         private void VolSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             foreach (MediaElement m in buttonSounds)
@@ -235,7 +218,7 @@ namespace Simon
 
             gameBoardButton = e.Source as Path;
 
-            ButtonPressed(gameBoardButton);
+            ButtonActivated(gameBoardButton);
         }
 
         // event handler for releasing mouse button
@@ -245,7 +228,7 @@ namespace Simon
 
             gameBoardButton = e.Source as Path;
 
-            ButtonReleased(gameBoardButton);
+            ButtonDeactivated(gameBoardButton);
         }
 
         // event handler for hovering your mouse off of button
@@ -255,7 +238,7 @@ namespace Simon
 
             gameBoardButton = e.Source as Path;
 
-            ButtonReleased(gameBoardButton);
+            ButtonDeactivated(gameBoardButton);
         }
 
         // this is the event handler for key down
@@ -266,22 +249,22 @@ namespace Simon
             {
                 if (buttonHotKeys[0] == e.Key && !txtSetGreenKey.IsFocused)
                 {
-                    ButtonPressed(buttonGreen);
+                    ButtonActivated(buttonGreen);
                 }
 
                 if (buttonHotKeys[1] == e.Key && !txtSetRedKey.IsFocused)
                 {
-                    ButtonPressed(buttonRed);
+                    ButtonActivated(buttonRed);
                 }
 
                 if (buttonHotKeys[2] == e.Key && !txtSetYellowKey.IsFocused)
                 {
-                    ButtonPressed(buttonYellow);
+                    ButtonActivated(buttonYellow);
                 }
 
                 if (buttonHotKeys[3] == e.Key && !txtSetBlueKey.IsFocused)
                 {
-                    ButtonPressed(buttonBlue);
+                    ButtonActivated(buttonBlue);
                 }
             }
         }
@@ -293,7 +276,7 @@ namespace Simon
             {
                 if (buttonHotKeys[0] == e.Key && !txtSetGreenKey.IsFocused)
                 {
-                    ButtonReleased(buttonGreen);
+                    ButtonDeactivated(buttonGreen);
                 }
             }
 
@@ -301,7 +284,7 @@ namespace Simon
             {
                 if (buttonHotKeys[1] == e.Key && !txtSetRedKey.IsFocused)
                 {
-                    ButtonReleased(buttonRed);
+                    ButtonDeactivated(buttonRed);
                 }
             }
 
@@ -309,7 +292,7 @@ namespace Simon
             {
                 if (buttonHotKeys[2] == e.Key && !txtSetYellowKey.IsFocused)
                 {
-                    ButtonReleased(buttonYellow);
+                    ButtonDeactivated(buttonYellow);
                 }
             }
 
@@ -317,13 +300,12 @@ namespace Simon
             {
                 if (buttonHotKeys[3] == e.Key && !txtSetBlueKey.IsFocused)
                 {
-                    ButtonReleased(buttonBlue);
+                    ButtonDeactivated(buttonBlue);
                 }
             }
         }
-         
-        DispatcherTimer setKeys = new DispatcherTimer();
-        
+             
+        // this allows the user to set the hot key.
         private void SetKey(object sender, KeyEventArgs e)
         {
 
@@ -353,14 +335,12 @@ namespace Simon
 
             Keyboard.ClearFocus();
 
-            setKeys.Tick += new EventHandler(SetKeys);
-            setKeys.Interval = new TimeSpan(0, 0, 0, 0, 500);
-            setKeys.Start();
+            timerToSetCustomKeys.Start();
         }
 
-        private void SetKeys(object sender, EventArgs e)
+        private void TimerToSetCustomKeys_Tick(object sender, EventArgs e)
         {
-            setKeys.Stop();
+            timerToSetCustomKeys.Stop();
 
             Keyboard.Focus(btnConfirmKeys);        
         }
@@ -401,17 +381,15 @@ namespace Simon
                 // Start inactivity countdown - game flashes  if left on for over 45s
             }
         }
-
-        
-
+     
+        // Start the game - set up variables based on slider positions
         private void btnStartGame(object sender, MouseButtonEventArgs e)
         {
             // begin game
-
             // generate random numbers for order
-
             Random rand = new Random();
 
+            //create list of random paths to be passed into button pressed/button released methods
             for (int i = 0; i < 35; i++)
             {
                 Path p = new Path();
@@ -439,11 +417,10 @@ namespace Simon
                 }
 
                 randomPaths.Add(p);
-
             }
-
         }
 
+        // save button uses stream writer to write to a text file
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             // stream reader for reading/writing info
@@ -457,7 +434,8 @@ namespace Simon
         }
 
 
-        // used to test sequence
+
+        // used to test sequence.  This will all get deleted
         int testsequence = -1;
 
         DispatcherTimer testTime = new DispatcherTimer();
@@ -470,31 +448,101 @@ namespace Simon
             testTime.Interval = new TimeSpan(0, 0, 0, 0, 250);
             testTime.Start();
 
-            ButtonPressed(randomPaths[testsequence]);            
+            ButtonActivated(randomPaths[testsequence]);            
         }
 
         private void testTime_Tick(object sender, EventArgs e)
         {
-            ButtonReleased(randomPaths[testsequence]);
+            ButtonDeactivated(randomPaths[testsequence]);
 
             testTime.Stop();
         }
 
-      
+        
+
         //  open the settings window when clicked
         private void settings_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow settingsWindow = new SettingsWindow();
-            settingsWindow.Show();
-
+            
+            
+            
+            settingsWindow.ShowDialog();
             
         }
+
+        
 
         // open the info window when clicked
         private void info_Click(object sender, RoutedEventArgs e)
         {
             InfoWindow infoWindow = new InfoWindow();
-            infoWindow.Show();
+            infoWindow.ShowDialog();
         }
+
+
+
+
+
+
+
+        // ------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
+        // BELOW THIS PIONT USED TO SET UP VARIABLES - WILL BE CALLED ON FORM LOAD
+        // ------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
+
+
+
+        private void SetupTimers()
+        {
+
+            TimertoLoopBtnSounds.Tick += new EventHandler(TimertoLoopBtnSounds_Tick);
+            TimertoLoopBtnSounds.Interval = new TimeSpan(0, 0, 1);
+
+
+            timerToSetCustomKeys.Tick += new EventHandler(TimerToSetCustomKeys_Tick);
+            timerToSetCustomKeys.Interval = new TimeSpan(0, 0, 0, 0, 500);
+
+        }
+
+
+        private void SetupMediaElements()
+        {
+
+            // get sounds from relative filepath and add to list of mediaElement objects
+            MediaElement sound = new MediaElement();
+            sound.Source = new Uri(@"../../Sounds/209hz_green_g#3.wav", UriKind.Relative);
+            sound.LoadedBehavior = MediaState.Manual;
+            sound.UnloadedBehavior = MediaState.Manual;
+            buttonSounds.Add(sound);
+
+            sound = new MediaElement();
+            sound.Source = new Uri(@"../../Sounds/252hz_red_b3.wav", UriKind.Relative);
+            sound.LoadedBehavior = MediaState.Manual;
+            sound.UnloadedBehavior = MediaState.Manual;
+            buttonSounds.Add(sound);
+
+            sound = new MediaElement();
+            sound.Source = new Uri(@"../../Sounds/310hz_yellow_d#4.wav", UriKind.Relative);
+            sound.LoadedBehavior = MediaState.Manual;
+            sound.UnloadedBehavior = MediaState.Manual;
+            buttonSounds.Add(sound);
+
+            sound = new MediaElement();
+            sound.Source = new Uri(@"../../Sounds/415hz_blue_g#4.wav", UriKind.Relative);
+            sound.LoadedBehavior = MediaState.Manual;
+            sound.UnloadedBehavior = MediaState.Manual;
+            buttonSounds.Add(sound);
+
+            sound = new MediaElement();
+            sound.Source = new Uri(@"../../Sounds/42hz_losing_tone.wav", UriKind.Relative);
+            sound.LoadedBehavior = MediaState.Manual;
+            sound.UnloadedBehavior = MediaState.Manual;
+            buttonSounds.Add(sound);
+
+
+        }
+
     }
 }

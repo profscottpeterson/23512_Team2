@@ -5,10 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Simon"
         mc:Ignorable="d"
-        Title="Memory Game" Loaded="Window_Loaded" Height="1024" Width="1264" KeyDown="ButtonPressed" KeyUp="ButtonReleased">
+        Title="Memory Game" Loaded="Window_Loaded" Height="885.334" Width="1258.667" KeyDown="ButtonPressed" KeyUp="ButtonReleased">
 
     <Grid x:Name="SimonWindow">
-        <Canvas x:Name="background" x:FieldModifier="public" Margin="0,10,392.333,101.667">
+        <Canvas x:Name="background" x:FieldModifier="public" Margin="0,0,392,0">
+            <Canvas.Background>
+                <ImageBrush Stretch="UniformToFill"/>
+            </Canvas.Background>
             <Ellipse Height="750" Canvas.Left="50" Stroke="Black" Width="750" StrokeThickness="0" Canvas.Top="50" Canvas.Bottom="50" Canvas.Right="50">
                 <Ellipse.Fill>
                     <RadialGradientBrush>
@@ -88,12 +91,11 @@
         <Label x:Name="greenKeyLabel" Content="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1009,238,0,0"/>
         <Label Content="Yellow" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1009,269,0,0"/>
         <Label Content="Blue" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1009,295,0,0"/>
-        <TextBox x:Name="txtSetGreenKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="Enter Key" VerticalAlignment="Top" Width="89" Margin="1075,215,0,0" KeyDown="SetKey"/>
-        <TextBox x:Name="txtSetRedKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="Enter Key" VerticalAlignment="Top" Width="89" Margin="1075,243,0,0" KeyDown="SetKey"/>
-        <TextBox x:Name="txtSetYellowKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="Enter Key" VerticalAlignment="Top" Width="89" Margin="1075,273,0,0" KeyDown="SetKey"/>
-        <TextBox x:Name="txtSetBlueKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="Enter Key" VerticalAlignment="Top" Width="89" Margin="1075,306,0,0" KeyDown="SetKey"/>
+        <TextBox x:Name="txtSetGreenKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="Q" VerticalAlignment="Top" Width="89" Margin="1075,215,0,0" KeyDown="SetKey"/>
+        <TextBox x:Name="txtSetRedKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="W" VerticalAlignment="Top" Width="89" Margin="1075,243,0,0" KeyDown="SetKey"/>
+        <TextBox x:Name="txtSetYellowKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="A" VerticalAlignment="Top" Width="89" Margin="1075,273,0,0" KeyDown="SetKey"/>
+        <TextBox x:Name="txtSetBlueKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="S" VerticalAlignment="Top" Width="89" Margin="1075,306,0,0" KeyDown="SetKey"/>
         <Button x:Name="btnConfirmKeys" Content="Confirm Custom Keys" HorizontalAlignment="Left" Margin="1048,351,0,0" VerticalAlignment="Top" Width="132" Height="59" Click="BtnConfirmKeys_Click"/>
-
 
         <DockPanel>
             <Menu DockPanel.Dock="Top">
@@ -114,7 +116,6 @@
         </DockPanel>
         <Button x:Name="btnSave" Content="Save Settings" HorizontalAlignment="Left" Margin="1052,668,0,0" VerticalAlignment="Top" Width="75" Click="BtnSave_Click"/>
         <Button x:Name="btnTestSequence" Content="Test Sequence" HorizontalAlignment="Left" Margin="1048,746,0,0" VerticalAlignment="Top" Width="104" Height="46" Click="BtnTestSequence_Click"/>
-        <Label x:Name="testText" Content="Volume" HorizontalAlignment="Left" Margin="1052,573,0,0" VerticalAlignment="Top"/>
     </Grid>
 
 

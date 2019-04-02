@@ -5,14 +5,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Simon"
         mc:Ignorable="d"
-        Title="SettingsWindow" Height="450" Width="800">
+        Title="SettingsWindow" Height="450" Width="800" Loaded="settingsLoaded">
     <Grid>
-        <StackPanel Margin="492,135,138.333,193.667">
-            <Label FontWeight="Bold">Select Your Background</Label>
-            <RadioButton x:Name="rdoWood" GroupName="ready" Checked="RadioButton_Checked">Wood</RadioButton>
-            <RadioButton GroupName="ready">Granite</RadioButton>
-            <RadioButton GroupName="ready" IsChecked="True">Outer Space</RadioButton>
-        </StackPanel>
-        <Button Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="357,314,0,0" Click="Button_Click"/>
+        <Border 
+          BorderBrush="SteelBlue" BorderThickness="3,5,3,5" CornerRadius="3" Margin="478,63,89.333,104.667"
+          >
+            <StackPanel Margin="7.333,4.667,0,5" HorizontalAlignment="Left" Width="200">
+                <Label FontWeight="Bold" Content="Select Your Background" Margin="0,0,0.333,0" Height="29"/>
+                <RadioButton x:Name="rdoWood" GroupName="ready"  Checked="rdoBtn_Checked" Margin="20,0,0.333,0" Content="Wood"/>
+                <RadioButton x:Name="rdoGranite" GroupName="ready" Checked="rdoBtn_Checked" Margin="20,0,0.333,0" Content="Granite"/>
+                <RadioButton x:Name="rdoSpace" GroupName="ready"  Checked="rdoBtn_Checked" Margin="20,0,0.333,0" Content="Outer Space"/>
+                <RadioButton x:Name="rdoRGB" GroupName="ready"  Checked="rdoBtn_Checked" Margin="20,0,0.333,0" Content="Custom RGB"/>
+                <StackPanel x:Name="rgbPanel" Margin="0,10,0.333,10" VerticalAlignment="Center">
+                    <DockPanel VerticalAlignment="Center" Margin="10">
+                        <Label DockPanel.Dock="Left" FontWeight="Bold" Content="R:"/>
+                        <TextBox Text="{Binding Value, ElementName=slColorR, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="40" />
+                        <Slider Maximum="255" TickPlacement="BottomRight" TickFrequency="5" IsSnapToTickEnabled="True" x:Name="slColorR" ValueChanged="ColorSlider_ValueChanged" />
+                    </DockPanel>
+
+                    <DockPanel VerticalAlignment="Center" Margin="10">
+                        <Label DockPanel.Dock="Left" FontWeight="Bold" Content="G:"/>
+                        <TextBox Text="{Binding Value, ElementName=slColorG, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="40" />
+                        <Slider Maximum="255" TickPlacement="BottomRight" TickFrequency="5" IsSnapToTickEnabled="True" x:Name="slColorG" ValueChanged="ColorSlider_ValueChanged" />
+                    </DockPanel>
+
+                    <DockPanel VerticalAlignment="Center" Margin="10">
+                        <Label DockPanel.Dock="Left" FontWeight="Bold" Content="B:"/>
+                        <TextBox Text="{Binding Value, ElementName=slColorB, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Right" Width="40" />
+                        <Slider Maximum="255" TickPlacement="BottomRight" TickFrequency="5" IsSnapToTickEnabled="True" x:Name="slColorB" ValueChanged="ColorSlider_ValueChanged" />
+                    </DockPanel>
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
