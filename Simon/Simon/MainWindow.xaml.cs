@@ -391,13 +391,19 @@ namespace Simon
 
         // round dispatcher timer
         DispatcherTimer roundTimer = new DispatcherTimer();
-
+        DispatcherTimer delaytimer = new DispatcherTimer();
+        
         // Start the game - set up variables based on slider positions
         private void btnStartGame(object sender, MouseButtonEventArgs e)
         {
             // set the roundTimer's properties
             roundTimer.Tick += new EventHandler(roundTimer_Tick);
             roundTimer.Interval = new TimeSpan(0, 0, 0, 0, 250);
+
+            delaytimer.Tick += new EventHandler(delayTimer_Tick);
+            delaytimer.Interval= new TimeSpan(0, 0, 0, 0, 250);
+
+
 
             // set the slider position
             skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
@@ -439,22 +445,10 @@ namespace Simon
             }
 
             // while it is not game over, run the round code
-            while (gameOver == false)
-            {
-                Round();
-            }
-
-            // check to see if player won the game or not
-            if (outcome == true)
-            {
-                // you won
-            }
-            else
-            {
-                // you lost
-            }
-
+             Round();
         }
+
+        
 
         // will return the maximum number of rounds
         public int GetMaxRounds(int lvl)
@@ -485,20 +479,14 @@ namespace Simon
         public void Round()
         {
             // resets round index
-            roundIndex = 0;
+            roundIndex=0;
 
             // increment currentRound
-            currentRound++;
-
-            while (roundIndex < currentRound)
-            {
-                roundTimer.Start();
-                ButtonActivated(randomPaths[roundIndex]);
-
-                roundIndex++;
-            }
-
-            gameOver = true;
+            currentRound=31;
+           
+            roundTimer.Start();
+            ButtonActivated(randomPaths[roundIndex]);
+            
         }
 
         private void roundTimer_Tick(object sender, EventArgs e)
@@ -506,6 +494,20 @@ namespace Simon
             roundTimer.Stop();
             ButtonDeactivated(randomPaths[roundIndex]);
             roundIndex++;
+
+            //put delay timer here
+            delaytimer.Start();
+    }
+
+        private void delayTimer_Tick(object sender, EventArgs e)
+        {
+            delaytimer.Stop();
+
+            if (roundIndex!=currentRound)
+            {
+                roundTimer.Start();
+                ButtonActivated(randomPaths[roundIndex]);
+            }
         }
 
 
