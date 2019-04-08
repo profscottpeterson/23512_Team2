@@ -71,6 +71,13 @@ namespace Simon
         // List used to fill with random paths for random sequence of lights
         List<Path> randomPaths = new List<Path>();
 
+        // Game running variables
+        int currentRound;
+        int roundIndex;
+        int maxRounds;
+        bool gameOver = false;
+        bool outcome = false;
+
         // window is loaded.  Create stuff
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -381,44 +388,132 @@ namespace Simon
                 // Start inactivity countdown - game flashes  if left on for over 45s
             }
         }
-     
+
+        // round dispatcher timer
+        DispatcherTimer roundTimer = new DispatcherTimer();
+
         // Start the game - set up variables based on slider positions
         private void btnStartGame(object sender, MouseButtonEventArgs e)
         {
-            // begin game
-            // generate random numbers for order
+            // set the roundTimer's properties
+            roundTimer.Tick += new EventHandler(roundTimer_Tick);
+            roundTimer.Interval = new TimeSpan(0, 0, 0, 0, 250);
+
+            // set the slider position
+            skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
+
+            // get the max number of possible rounds, store it in the global variable 
+            maxRounds = GetMaxRounds(skillLevelSliderPosition);
+
+            // generate random numbers for order --- I think we should move this into the game class later on, under the CreateRandomList() method
             Random rand = new Random();
 
             //create list of random paths to be passed into button pressed/button released methods
-            for (int i = 0; i < 35; i++)
+            for (int i = 0; i < maxRounds; i++)
             {
                 Path p = new Path();
 
-                int tempRandom = rand.Next(0,4);
+                int tempRandom = rand.Next(0, 4);
 
-                if(tempRandom==0)
+                if (tempRandom == 0)
                 {
-                    p=buttonGreen;
+                    p = buttonGreen;
                 }
 
                 if (tempRandom == 1)
                 {
-                    p=buttonRed;
+                    p = buttonRed;
                 }
 
                 if (tempRandom == 2)
                 {
-                    p=buttonYellow;
+                    p = buttonYellow;
                 }
 
                 if (tempRandom == 3)
                 {
-                    p=buttonBlue;
+                    p = buttonBlue;
                 }
 
                 randomPaths.Add(p);
             }
+
+            // while it is not game over, run the round code
+            while (gameOver == false)
+            {
+                Round();
+            }
+
+            // check to see if player won the game or not
+            if (outcome == true)
+            {
+                // you won
+            }
+            else
+            {
+                // you lost
+            }
+
         }
+
+        // will return the maximum number of rounds
+        public int GetMaxRounds(int lvl)
+        {
+            int m;
+
+            if (lvl == 1)
+            {
+                m = 8;
+            }
+            else if (lvl == 2)
+            {
+                m = 14;
+            }
+            else if (lvl == 3)
+            {
+                m = 20;
+            }
+            else
+            {
+                m = 31;
+            }
+
+            return m;
+        }
+
+        // code that runs during each round
+        public void Round()
+        {
+            // resets round index
+            roundIndex = 0;
+
+            // increment currentRound
+            currentRound++;
+
+            while (roundIndex < currentRound)
+            {
+                roundTimer.Start();
+                ButtonActivated(randomPaths[roundIndex]);
+
+                roundIndex++;
+            }
+
+            gameOver = true;
+        }
+
+        private void roundTimer_Tick(object sender, EventArgs e)
+        {
+            roundTimer.Stop();
+            ButtonDeactivated(randomPaths[roundIndex]);
+            roundIndex++;
+        }
+
+
+        // ------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
+        // GAME RUNNING CODE ABOVE THIS POINT
+        // ------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
 
         // save button uses stream writer to write to a text file
         private void BtnSave_Click(object sender, RoutedEventArgs e)
