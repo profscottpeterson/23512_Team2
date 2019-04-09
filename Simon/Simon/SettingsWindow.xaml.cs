@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Simon
 {
@@ -29,6 +30,11 @@ namespace Simon
         ImageBrush spaceBrush = new ImageBrush();
         SolidColorBrush rgbBrush = new SolidColorBrush();
 
+        public Settings settingsWindowSettings = new Settings();
+
+        // timer to change focus away from text field and set custom keys
+        DispatcherTimer timerToSetCustomKeys = new DispatcherTimer();
+
         private void settingsLoaded(object sender, RoutedEventArgs e)
         {
             // set up pictures
@@ -43,6 +49,14 @@ namespace Simon
             Image spaceImage = new Image();
             spaceImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/OuterSpace.jpg"));
             spaceBrush.ImageSource = spaceImage.Source;
+
+            // make button "invisible"
+            btnConfirmKeys.Height = 0;
+            btnConfirmKeys.Width = 0;
+
+            // key binding timer
+            timerToSetCustomKeys.Tick += new EventHandler(TimerToSetCustomKeys_Tick);
+            timerToSetCustomKeys.Interval = new TimeSpan(0, 0, 0, 0, 100);
         }
 
 
@@ -79,6 +93,66 @@ namespace Simon
             Color RGBBackground = Color.FromRgb(Convert.ToByte(slColorR.Value), Convert.ToByte(slColorG.Value), Convert.ToByte(slColorB.Value));
             rgbBrush.Color = RGBBackground;
             ((MainWindow)Application.Current.MainWindow).background.Background = rgbBrush;
+        }
+
+
+        // this allows the user to set the hot key.
+        private void SetKey(object sender, KeyEventArgs e)
+        {
+            try { 
+            if (txtSetGreenKey.IsFocused)
+            {
+                settingsWindowSettings.GreenKey = Convert.ToChar(e.Key.ToString());
+                txtSetGreenKey.Text = e.Key.ToString();
+            }
+
+            if (txtSetRedKey.IsFocused)
+            {
+                settingsWindowSettings.RedKey = Convert.ToChar(e.Key.ToString());
+                txtSetRedKey.Text = e.Key.ToString();
+            }
+
+            if (txtSetYellowKey.IsFocused)
+            {
+                settingsWindowSettings.YellowKey = Convert.ToChar(e.Key.ToString());
+                txtSetYellowKey.Text = e.Key.ToString();
+            }
+
+            if (txtSetBlueKey.IsFocused)
+            {
+                settingsWindowSettings.BlueKey = Convert.ToChar(e.Key.ToString());
+                txtSetBlueKey.Text = e.Key.ToString();
+            }
+                 }
+            catch
+            {
+                MessageBox.Show("Your key bindings must be letters A-Z, numbers 0-9");
+            }
+            Keyboard.ClearFocus();
+
+            timerToSetCustomKeys.Start();
+        }
+
+        private void TimerToSetCustomKeys_Tick(object sender, EventArgs e)
+        {
+            timerToSetCustomKeys.Stop();
+
+            Keyboard.Focus(btnConfirmKeys);
+        }
+
+        private void BtnConfirmKeys_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void VolSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            settingsWindowSettings.VolumeSlider = Convert.ToInt32(VolSlider.Value); 
+        }
+
+        private void SettingsClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {           
+            ((MainWindow)Application.Current.MainWindow).setkeyBindingsFromOtherWindow();
         }
     }
 }

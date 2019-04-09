@@ -28,7 +28,10 @@ namespace Simon
         {
             InitializeComponent();
         }
-   
+
+        //instantiate the settings class
+        public Settings MainSettings = new Settings();
+
         // create media element.  We will set items from a list of media elements to this variable throughout the program
         MediaElement me = new MediaElement();
 
@@ -37,9 +40,6 @@ namespace Simon
 
         // timer to repeat button sounds when button is held
         DispatcherTimer TimertoLoopBtnSounds = new DispatcherTimer();
-
-        // timer to change focus away from text field and set custom keys
-        DispatcherTimer timerToSetCustomKeys = new DispatcherTimer();
 
         // this list of keys.  User can set hot keys to press simon buttons instead of using mouse
         List<Key> buttonHotKeys = new List<Key>();
@@ -99,17 +99,10 @@ namespace Simon
             buttonHotKeys[2] = Key.A;
             buttonHotKeys[3] = Key.S;
 
-            // set positions of all controls
-            VolSlider.Value = 2; // 66% sound
-            me.Volume = VolSlider.Value * .33;
-
             me.LoadedBehavior = MediaState.Manual;
             me.UnloadedBehavior = MediaState.Manual;
 
-            btnConfirmKeys.Height = 0;
-            btnConfirmKeys.Width = 0;
-
-
+            // load game settings
             if (File.Exists("saveFile.txt"))
             {
                 // stream reader, read save file
@@ -209,15 +202,6 @@ namespace Simon
             me.Play();
         }
 
-        // This sets the volume for all button sounds
-        private void VolSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            foreach (MediaElement m in buttonSounds)
-            {
-                m.Volume = VolSlider.Value * .33;
-            }
-        }
-
         // event handler for pressing button (clicking mouse)
         private void ButtonPressed(object sender, MouseButtonEventArgs e)
         {
@@ -254,22 +238,22 @@ namespace Simon
             // if this if statment isn't here, the audio won't repeat
             if (!e.IsRepeat)
             {
-                if (buttonHotKeys[0] == e.Key && !txtSetGreenKey.IsFocused)
+                if (buttonHotKeys[0] == e.Key)
                 {
                     ButtonActivated(buttonGreen);
                 }
 
-                if (buttonHotKeys[1] == e.Key && !txtSetRedKey.IsFocused)
+                if (buttonHotKeys[1] == e.Key)
                 {
                     ButtonActivated(buttonRed);
                 }
 
-                if (buttonHotKeys[2] == e.Key && !txtSetYellowKey.IsFocused)
+                if (buttonHotKeys[2] == e.Key)
                 {
                     ButtonActivated(buttonYellow);
                 }
 
-                if (buttonHotKeys[3] == e.Key && !txtSetBlueKey.IsFocused)
+                if (buttonHotKeys[3] == e.Key)
                 {
                     ButtonActivated(buttonBlue);
                 }
@@ -278,102 +262,36 @@ namespace Simon
    
         // This is the event handler for key up
         private void ButtonReleased(object sender, KeyEventArgs e)
-        {
-            if (!txtSetGreenKey.IsFocused)
+        {         
+            if (buttonHotKeys[0] == e.Key)
             {
-                if (buttonHotKeys[0] == e.Key && !txtSetGreenKey.IsFocused)
-                {
-                    ButtonDeactivated(buttonGreen);
-                }
+                ButtonDeactivated(buttonGreen);
             }
 
-            if (!txtSetRedKey.IsFocused)
+            if (buttonHotKeys[1] == e.Key)
             {
-                if (buttonHotKeys[1] == e.Key && !txtSetRedKey.IsFocused)
-                {
-                    ButtonDeactivated(buttonRed);
-                }
+                ButtonDeactivated(buttonRed);
             }
 
-            if (!txtSetYellowKey.IsFocused)
+            if (buttonHotKeys[2] == e.Key)
             {
-                if (buttonHotKeys[2] == e.Key && !txtSetYellowKey.IsFocused)
-                {
-                    ButtonDeactivated(buttonYellow);
-                }
+                ButtonDeactivated(buttonYellow);
             }
 
-            if (!txtSetBlueKey.IsFocused)
+            if (buttonHotKeys[3] == e.Key)
             {
-                if (buttonHotKeys[3] == e.Key && !txtSetBlueKey.IsFocused)
-                {
-                    ButtonDeactivated(buttonBlue);
-                }
+                ButtonDeactivated(buttonBlue);
             }
-        }
-             
-        // this allows the user to set the hot key.
-        private void SetKey(object sender, KeyEventArgs e)
-        {
-
-            if (txtSetGreenKey.IsFocused)
-            { 
-                buttonHotKeys[0] = e.Key;
-                txtSetGreenKey.Text = e.Key.ToString();
-            }
-
-            if (txtSetRedKey.IsFocused)
-            {
-                buttonHotKeys[1] = e.Key;
-                txtSetRedKey.Text = e.Key.ToString();      
-            }
-
-            if (txtSetYellowKey.IsFocused)
-            {
-                buttonHotKeys[2] = e.Key;
-                txtSetYellowKey.Text = e.Key.ToString();             
-            }
-
-            if (txtSetBlueKey.IsFocused)
-            {
-                buttonHotKeys[3] = e.Key;
-                txtSetBlueKey.Text = e.Key.ToString();          
-            }
-
-            Keyboard.ClearFocus();
-
-            timerToSetCustomKeys.Start();
-        }
-
-        private void TimerToSetCustomKeys_Tick(object sender, EventArgs e)
-        {
-            timerToSetCustomKeys.Stop();
-
-            Keyboard.Focus(btnConfirmKeys);        
-        }
-
-        private void BtnConfirmKeys_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void GameSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
             gameSliderPosition = Convert.ToInt32(gameSlider.Value);
-            
-            //debug
-            //debugGameSlider.Content = "Game Slider Pos: " + gameSliderPosition.ToString();
-
-           // debugGameSlider.Content = "asdf";
         }
 
         private void SkillLevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
-
-            //debug
-            // debugSkillSlider.Content = "Skill Slider Pos: " + skillLevelSliderPosition.ToString();
         }
 
         private void PwrSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -402,7 +320,6 @@ namespace Simon
 
             delaytimer.Tick += new EventHandler(delayTimer_Tick);
             delaytimer.Interval= new TimeSpan(0, 0, 0, 0, 250);
-
 
 
             // set the slider position
@@ -448,8 +365,6 @@ namespace Simon
              Round();
         }
 
-        
-
         // will return the maximum number of rounds
         public int GetMaxRounds(int lvl)
         {
@@ -485,8 +400,7 @@ namespace Simon
             currentRound=31;
            
             roundTimer.Start();
-            ButtonActivated(randomPaths[roundIndex]);
-            
+            ButtonActivated(randomPaths[roundIndex]); 
         }
 
         private void roundTimer_Tick(object sender, EventArgs e)
@@ -497,7 +411,7 @@ namespace Simon
 
             //put delay timer here
             delaytimer.Start();
-    }
+        }
 
         private void delayTimer_Tick(object sender, EventArgs e)
         {
@@ -509,7 +423,6 @@ namespace Simon
                 ButtonActivated(randomPaths[roundIndex]);
             }
         }
-
 
         // ------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------
@@ -530,45 +443,21 @@ namespace Simon
             sw.Flush();
         }
 
-
-
-        // used to test sequence.  This will all get deleted
-        int testsequence = -1;
-
-        DispatcherTimer testTime = new DispatcherTimer();
-
-        private void BtnTestSequence_Click(object sender, RoutedEventArgs e)
-        {
-            testsequence++;
-
-            testTime.Tick += new EventHandler(testTime_Tick);
-            testTime.Interval = new TimeSpan(0, 0, 0, 0, 250);
-            testTime.Start();
-
-            ButtonActivated(randomPaths[testsequence]);            
-        }
-
-        private void testTime_Tick(object sender, EventArgs e)
-        {
-            ButtonDeactivated(randomPaths[testsequence]);
-
-            testTime.Stop();
-        }
-
-        
-
         //  open the settings window when clicked
         private void settings_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow settingsWindow = new SettingsWindow();
-            
-            
-            
+            settingsWindow.settingsWindowSettings = MainSettings;
             settingsWindow.ShowDialog();
-            
         }
 
-        
+        public void setkeyBindingsFromOtherWindow()
+        {
+            buttonHotKeys[0] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.GreenKey));
+            buttonHotKeys[1] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.RedKey));
+            buttonHotKeys[2] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.YellowKey));
+            buttonHotKeys[3] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.BlueKey));
+        }
 
         // open the info window when clicked
         private void info_Click(object sender, RoutedEventArgs e)
@@ -577,32 +466,16 @@ namespace Simon
             infoWindow.ShowDialog();
         }
 
-
-
-
-
-
-
         // ------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------
         // BELOW THIS PIONT USED TO SET UP VARIABLES - WILL BE CALLED ON FORM LOAD
         // ------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------
-
-
-
         private void SetupTimers()
         {
-
             TimertoLoopBtnSounds.Tick += new EventHandler(TimertoLoopBtnSounds_Tick);
             TimertoLoopBtnSounds.Interval = new TimeSpan(0, 0, 1);
-
-
-            timerToSetCustomKeys.Tick += new EventHandler(TimerToSetCustomKeys_Tick);
-            timerToSetCustomKeys.Interval = new TimeSpan(0, 0, 0, 0, 500);
-
         }
-
 
         private void SetupMediaElements()
         {
@@ -637,9 +510,8 @@ namespace Simon
             sound.LoadedBehavior = MediaState.Manual;
             sound.UnloadedBehavior = MediaState.Manual;
             buttonSounds.Add(sound);
-
-
         }
+
 
     }
 }

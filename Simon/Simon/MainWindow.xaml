@@ -85,17 +85,6 @@
             <Label x:Name="btnStartLabel" Content="START" Canvas.Top="504" Height="22" Width="40" Canvas.Left="404" FontSize="10"/>
             <Label x:Name="btnLongestLabel" Content="LONGEST" Canvas.Top="504" Height="22" Width="55" Canvas.Left="479" FontSize="10"/>
         </Canvas>
-        <Slider x:Name="VolSlider" HorizontalAlignment="Left" Margin="1085,475,0,0" VerticalAlignment="Top" Height="33" Width="70" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="3" BorderBrush="#00000000" Foreground="Black" ValueChanged="VolSlider_ValueChanged"/>
-        <Label x:Name="volSliderLabel" Content="Volume" HorizontalAlignment="Left" Margin="1085,513,0,0" VerticalAlignment="Top"/>
-        <Label Content="Green" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1009,213,0,0"/>
-        <Label x:Name="greenKeyLabel" Content="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1009,238,0,0"/>
-        <Label Content="Yellow" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1009,269,0,0"/>
-        <Label Content="Blue" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1009,295,0,0"/>
-        <TextBox x:Name="txtSetGreenKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="Q" VerticalAlignment="Top" Width="89" Margin="1075,215,0,0" KeyDown="SetKey"/>
-        <TextBox x:Name="txtSetRedKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="W" VerticalAlignment="Top" Width="89" Margin="1075,243,0,0" KeyDown="SetKey"/>
-        <TextBox x:Name="txtSetYellowKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="A" VerticalAlignment="Top" Width="89" Margin="1075,273,0,0" KeyDown="SetKey"/>
-        <TextBox x:Name="txtSetBlueKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="S" VerticalAlignment="Top" Width="89" Margin="1075,306,0,0" KeyDown="SetKey"/>
-        <Button x:Name="btnConfirmKeys" Content="Confirm Custom Keys" HorizontalAlignment="Left" Margin="1048,351,0,0" VerticalAlignment="Top" Width="132" Height="59" Click="BtnConfirmKeys_Click"/>
 
         <DockPanel>
             <Menu DockPanel.Dock="Top">
@@ -114,8 +103,7 @@
             <StackPanel></StackPanel>
             <StackPanel/>
         </DockPanel>
-        <Button x:Name="btnSave" Content="Save Settings" HorizontalAlignment="Left" Margin="1052,668,0,0" VerticalAlignment="Top" Width="75" Click="BtnSave_Click"/>
-        <Button x:Name="btnTestSequence" Content="Test Sequence" HorizontalAlignment="Left" Margin="1048,746,0,0" VerticalAlignment="Top" Width="104" Height="46" Click="BtnTestSequence_Click"/>
+        <Button x:Name="btnSave" Content="Save Settings" HorizontalAlignment="Left" Margin="1012,635,0,0" VerticalAlignment="Top" Width="75" Click="BtnSave_Click"/>
     </Grid>
 
 

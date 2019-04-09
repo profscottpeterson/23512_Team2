@@ -5,11 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Simon"
         mc:Ignorable="d"
-        Title="SettingsWindow" Height="450" Width="800" Loaded="settingsLoaded">
+        Title="SettingsWindow" Height="450" Width="800" Loaded="settingsLoaded" Closing="SettingsClosing">
     <Grid>
         <Border 
-          BorderBrush="SteelBlue" BorderThickness="3,5,3,5" CornerRadius="3" Margin="478,63,89.333,104.667"
-          >
+          BorderBrush="SteelBlue" BorderThickness="3,5,3,5" CornerRadius="3" Margin="478,63,89.333,104.667">
             <StackPanel Margin="7.333,4.667,0,5" HorizontalAlignment="Left" Width="200">
                 <Label FontWeight="Bold" Content="Select Your Background" Margin="0,0,0.333,0" Height="29"/>
                 <RadioButton x:Name="rdoWood" GroupName="ready"  Checked="rdoBtn_Checked" Margin="20,0,0.333,0" Content="Wood"/>
@@ -37,5 +36,16 @@
                 </StackPanel>
             </StackPanel>
         </Border>
+        <Slider x:Name="VolSlider" HorizontalAlignment="Left" Margin="161,283,0,0" VerticalAlignment="Top" Height="33" Width="70" SmallChange="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Maximum="3" BorderBrush="#00000000" Foreground="Black" ValueChanged="VolSlider_ValueChanged"/>
+        <Label x:Name="volSliderLabel" Content="Volume" HorizontalAlignment="Left" Margin="181,321,0,0" VerticalAlignment="Top"/>
+        <Label Content="Green" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="96,48,0,0"/>
+        <Label x:Name="greenKeyLabel" Content="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="96,73,0,0"/>
+        <Label Content="Yellow" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="96,104,0,0"/>
+        <Label Content="Blue" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="96,130,0,0"/>
+        <TextBox x:Name="txtSetGreenKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="Q" VerticalAlignment="Top" Width="89" Margin="161,49,0,0" KeyDown="SetKey"/>
+        <TextBox x:Name="txtSetRedKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="W" VerticalAlignment="Top" Width="89" Margin="161,77,0,0" KeyDown="SetKey"/>
+        <TextBox x:Name="txtSetYellowKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="A" VerticalAlignment="Top" Width="89" Margin="161,108,0,0" KeyDown="SetKey"/>
+        <TextBox x:Name="txtSetBlueKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="S" VerticalAlignment="Top" Width="89" Margin="161,141,0,0" KeyDown="SetKey"/>
+        <Button x:Name="btnConfirmKeys" Content="Confirm Custom Keys" HorizontalAlignment="Left" Margin="135,186,0,0" VerticalAlignment="Top" Width="132" Height="59" Click="BtnConfirmKeys_Click"/>
     </Grid>
 </Window>
