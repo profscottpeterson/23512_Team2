@@ -71,12 +71,18 @@ namespace Simon
         // List used to fill with random paths for random sequence of lights
         List<Path> randomPaths = new List<Path>();
 
+        //Running list of player choices. Purged after each check. NOT USED
+        List<Path> player1Paths = new List<Path>();
+
         // Game running variables
         int currentRound;
         int roundIndex;
         int maxRounds;
         bool gameOver = false;
         bool outcome = false;
+        bool endRound = false;
+
+        bool roundOver = false;
 
         // window is loaded.  Create stuff
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -393,6 +399,9 @@ namespace Simon
         // code that runs during each round
         public void Round()
         {
+            //resets endRound variable
+            endRound = false;
+
             // resets round index
             roundIndex=0;
 
@@ -400,8 +409,55 @@ namespace Simon
             currentRound=31;
            
             roundTimer.Start();
-            ButtonActivated(randomPaths[roundIndex]); 
+            ButtonActivated(randomPaths[roundIndex]);
+
+            
+            /*
+            while (!endRound)
+            {
+                //checkPlayerChoice(PLAYERCHOICE);
+                checkEndRound();
+            }
+            resetRound();
+            */
         }
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void checkEndRound()
+        {
+            if(roundIndex <= currentRound)
+            {
+                endRound = false;
+                roundIndex++;
+            }
+            else
+            {
+                endRound = true;
+            }
+        }
+
+        public void resetRound()
+        {
+            roundIndex = 0;
+            roundOver = false;
+            currentRound++;
+        }
+
+
+        public void checkPlayerChoice(Path playerChoice)
+        {
+            if(playerChoice != randomPaths[roundIndex])
+            {
+                gameOver = true;
+            }
+            else
+            {
+                gameOver = false;
+            }
+        }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         private void roundTimer_Tick(object sender, EventArgs e)
         {
@@ -423,6 +479,11 @@ namespace Simon
                 ButtonActivated(randomPaths[roundIndex]);
             }
         }
+
+       
+       
+
+        
 
         // ------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------
