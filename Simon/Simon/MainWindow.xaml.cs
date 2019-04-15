@@ -68,6 +68,10 @@ namespace Simon
         int skillLevelSliderPosition;
         int powerSliderPosition;
 
+        // Menka Begin
+        int userButtonCounter;
+        // Menka End
+
         // List used to fill with random paths for random sequence of lights
         List<Path> randomPaths = new List<Path>();
 
@@ -129,7 +133,7 @@ namespace Simon
         private void ButtonActivated(System.Windows.Shapes.Path gameBoardButton)
         {
             // start timer
-           
+
             TimertoLoopBtnSounds.Start();
 
             if (gameBoardButton.Name == "buttonGreen")
@@ -210,6 +214,43 @@ namespace Simon
             gameBoardButton = e.Source as Path;
 
             ButtonActivated(gameBoardButton);
+
+            //Menka Added
+            if (gameBoardButton.Name == randomPaths[userButtonCounter].Name)
+            {
+                MessageBox.Show("Good Job Keep Going");
+            }
+            else
+            {
+                MessageBox.Show("Better Luck Next Time");
+            }
+
+
+
+            /*
+            if (userButtonCounter == 2)
+            {
+                if (gameBoardButton.Name == randomPaths[1].Name)
+                {
+                    MessageBox.Show("Good Job you cleared level1");
+                }
+                else
+                {
+                    MessageBox.Show("Better Luck Next Time");
+                }
+
+            }
+
+    */
+            if (userButtonCounter == randomPaths.Count - 1)
+            {
+                MessageBox.Show("Level Cleared");
+                userButtonCounter = 0;
+            }
+            else
+            { userButtonCounter = userButtonCounter + 1; }
+
+
         }
 
         // event handler for releasing mouse button
@@ -259,10 +300,10 @@ namespace Simon
                 }
             }
         }
-   
+
         // This is the event handler for key up
         private void ButtonReleased(object sender, KeyEventArgs e)
-        {         
+        {
             if (buttonHotKeys[0] == e.Key)
             {
                 ButtonDeactivated(buttonGreen);
@@ -297,7 +338,7 @@ namespace Simon
         private void PwrSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             powerSliderPosition = Convert.ToInt32(pwrSlider.Value);
-          
+
             // game turned on
             if (powerSliderPosition == 1)
             {
@@ -310,7 +351,7 @@ namespace Simon
         // round dispatcher timer
         DispatcherTimer roundTimer = new DispatcherTimer();
         DispatcherTimer delaytimer = new DispatcherTimer();
-        
+
         // Start the game - set up variables based on slider positions
         private void btnStartGame(object sender, MouseButtonEventArgs e)
         {
@@ -319,15 +360,18 @@ namespace Simon
             roundTimer.Interval = new TimeSpan(0, 0, 0, 0, 250);
 
             delaytimer.Tick += new EventHandler(delayTimer_Tick);
-            delaytimer.Interval= new TimeSpan(0, 0, 0, 0, 250);
+            delaytimer.Interval = new TimeSpan(0, 0, 0, 0, 250);
 
+            // menka
+            randomPaths.Clear();
+            userButtonCounter = 0;
+            //Menka End
 
             // set the slider position
             skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
 
             // get the max number of possible rounds, store it in the global variable 
             maxRounds = GetMaxRounds(skillLevelSliderPosition);
-
             // generate random numbers for order --- I think we should move this into the game class later on, under the CreateRandomList() method
             Random rand = new Random();
 
@@ -362,17 +406,19 @@ namespace Simon
             }
 
             // while it is not game over, run the round code
-             Round();
+            Round();
         }
 
         // will return the maximum number of rounds
         public int GetMaxRounds(int lvl)
         {
+
+
             int m;
 
             if (lvl == 1)
             {
-                m = 8;
+                m = 4;
             }
             else if (lvl == 2)
             {
@@ -394,13 +440,19 @@ namespace Simon
         public void Round()
         {
             // resets round index
-            roundIndex=0;
+            roundIndex = 0;
 
             // increment currentRound
-            currentRound=31;
-           
+
+            // set the slider position
+            skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
+
+            // get the max number of possible rounds, store it in the global variable 
+            currentRound = GetMaxRounds(skillLevelSliderPosition);
+
+
             roundTimer.Start();
-            ButtonActivated(randomPaths[roundIndex]); 
+            ButtonActivated(randomPaths[roundIndex]);
         }
 
         private void roundTimer_Tick(object sender, EventArgs e)
@@ -417,7 +469,7 @@ namespace Simon
         {
             delaytimer.Stop();
 
-            if (roundIndex!=currentRound)
+            if (roundIndex != currentRound)
             {
                 roundTimer.Start();
                 ButtonActivated(randomPaths[roundIndex]);
@@ -439,7 +491,7 @@ namespace Simon
             sw.WriteLine(gameSliderPosition.ToString());
             sw.WriteLine(skillLevelSliderPosition.ToString());
             sw.WriteLine(powerSliderPosition.ToString());
-            
+
             sw.Flush();
         }
 
@@ -515,3 +567,4 @@ namespace Simon
 
     }
 }
+s
