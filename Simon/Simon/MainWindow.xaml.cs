@@ -537,7 +537,7 @@ namespace Simon
             sound.Source = new Uri(@"../../Sounds/209hz_green_g#3.wav", UriKind.Relative);
             sound.LoadedBehavior = MediaState.Manual;
             sound.UnloadedBehavior = MediaState.Manual;
-            buttonSounds.Add(sound);
+            buattonSounds.Add(sound);
 
             sound = new MediaElement();
             sound.Source = new Uri(@"../../Sounds/252hz_red_b3.wav", UriKind.Relative);
