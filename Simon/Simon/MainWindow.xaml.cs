@@ -461,9 +461,6 @@ namespace Simon
 
                 // reset the roundIndex
                 roundIndex = 0; 
-
-                // start the user's portion of the round
-                UserRound(); 
             }
         }
 
@@ -473,19 +470,6 @@ namespace Simon
             timeoutTimer.Stop();
 
             GameOver(); 
-        }
-
-        // user clicking buttons part of the round
-        public void UserRound()
-        {
-            /*
-            buttonHotKeys[0] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.GreenKey));
-            buttonHotKeys[1] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.RedKey));
-            buttonHotKeys[2] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.YellowKey));
-            buttonHotKeys[3] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.BlueKey)); 
-            */
-
-            
         }
 
         public void CheckCorrectButton (string b)
