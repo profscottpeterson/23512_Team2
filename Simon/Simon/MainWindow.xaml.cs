@@ -137,6 +137,11 @@ namespace Simon
                 RadialGradientBrush r = new RadialGradientBrush(greenPressed1, greenPressed2);
                 gameBoardButton.Fill = r;
                 me = buttonSounds[0];
+
+                if (timeoutTimer.IsEnabled)
+                {
+                    CheckCorrectButton("buttonGreen");
+                }
             }
 
             if (gameBoardButton.Name == "buttonRed")
@@ -144,6 +149,11 @@ namespace Simon
                 RadialGradientBrush r = new RadialGradientBrush(redPressed1, redPressed2);
                 gameBoardButton.Fill = r;
                 me = buttonSounds[1];
+
+                if (timeoutTimer.IsEnabled)
+                {
+                    CheckCorrectButton("buttonRed");
+                }
             }
 
             if (gameBoardButton.Name == "buttonYellow")
@@ -151,6 +161,11 @@ namespace Simon
                 RadialGradientBrush r = new RadialGradientBrush(yellowPressed1, yellowPressed2);
                 gameBoardButton.Fill = r;
                 me = buttonSounds[2];
+
+                if (timeoutTimer.IsEnabled)
+                {
+                    CheckCorrectButton("buttonYellow");
+                }
             }
 
             if (gameBoardButton.Name == "buttonBlue")
@@ -158,6 +173,11 @@ namespace Simon
                 RadialGradientBrush r = new RadialGradientBrush(bluePressed1, bluePressed2);
                 gameBoardButton.Fill = r;
                 me = buttonSounds[3];
+
+                if (timeoutTimer.IsEnabled)
+                {
+                    CheckCorrectButton("buttonBlue");
+                }
             }
             me.Play();
         }
@@ -307,10 +327,19 @@ namespace Simon
             }
         }
 
+        // ------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
+        // GAME RUNNING CODE BELOW THIS POINT
+        // ------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------
+
         // round dispatcher timer
         DispatcherTimer roundTimer = new DispatcherTimer();
         DispatcherTimer delaytimer = new DispatcherTimer();
-        
+
+        // time-out timer
+        DispatcherTimer timeoutTimer = new DispatcherTimer();
+
         // Start the game - set up variables based on slider positions
         private void btnStartGame(object sender, MouseButtonEventArgs e)
         {
@@ -320,6 +349,9 @@ namespace Simon
 
             delaytimer.Tick += new EventHandler(delayTimer_Tick);
             delaytimer.Interval= new TimeSpan(0, 0, 0, 0, 250);
+
+            timeoutTimer.Tick += new EventHandler(timeoutTimer_Tick);
+            timeoutTimer.Interval = new TimeSpan(0, 0, 0, 3, 0);
 
 
             // set the slider position
@@ -394,10 +426,10 @@ namespace Simon
         public void Round()
         {
             // resets round index
-            roundIndex=0;
+            roundIndex = 0;
 
             // increment currentRound
-            currentRound=31;
+            currentRound++;
            
             roundTimer.Start();
             ButtonActivated(randomPaths[roundIndex]); 
@@ -422,6 +454,71 @@ namespace Simon
                 roundTimer.Start();
                 ButtonActivated(randomPaths[roundIndex]);
             }
+            else
+            {
+                // start time-out timer
+                timeoutTimer.Start();
+
+                // reset the roundIndex
+                roundIndex = 0; 
+
+                // start the user's portion of the round
+                UserRound(); 
+            }
+        }
+
+        // 3 second timer that checks for game over
+        private void timeoutTimer_Tick(object sender, EventArgs e)
+        {
+            timeoutTimer.Stop();
+
+            GameOver(); 
+        }
+
+        // user clicking buttons part of the round
+        public void UserRound()
+        {
+            /*
+            buttonHotKeys[0] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.GreenKey));
+            buttonHotKeys[1] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.RedKey));
+            buttonHotKeys[2] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.YellowKey));
+            buttonHotKeys[3] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.BlueKey)); 
+            */
+
+            
+        }
+
+        public void CheckCorrectButton (string b)
+        {
+            if (b == randomPaths[roundIndex].Name)
+            {
+                timeoutTimer.Stop();
+                timeoutTimer.Start();
+                roundIndex++; 
+            }
+            else
+            {
+                GameOver(); 
+            }
+
+            if (roundIndex == currentRound)
+            {
+                timeoutTimer.Stop();
+                
+                Round(); 
+            }
+        }
+
+        // method that holds the game over code
+        public void GameOver()
+        {
+            // stop the timer
+            timeoutTimer.Stop(); 
+
+            // disable all buttons <-- Do we want to do something like this? 
+
+            // game over
+            MessageBox.Show("Game Over!"); 
         }
 
         // ------------------------------------------------------------------------------------------------
