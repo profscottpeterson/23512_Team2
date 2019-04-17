@@ -65,5 +65,71 @@ namespace Simon
             get { return volumeSlider; }
             set { volumeSlider = value; }
         }
+
+
+        // background color related items
+        private bool backGrndWood;
+        public bool BackGrndWood
+        {
+            get { return backGrndWood; }
+            set { backGrndWood = value; }
+        }
+
+        private bool backGrndGranite;
+        public bool BackGrndGranite
+        {
+            get { return backGrndGranite; }
+            set { backGrndGranite = value; }
+        }
+
+        private bool backGrndSpace;
+        public bool BackGrndSpace
+        {
+            get { return backGrndSpace; }
+            set { backGrndSpace = value; }
+        }
+        private bool backGrndRGB;
+
+        public bool BackGrndRGB
+        {
+            get { return backGrndRGB; }
+            set { backGrndRGB = value; }
+        }
+
+        private int rgbRedSlider;
+        public int RgbRedSlider
+        {
+            get { return rgbRedSlider; }
+            set { rgbRedSlider = value; }
+        }
+
+        private int rgbGreenSlider;
+        public int RgbGreenSlider
+        {
+            get { return rgbGreenSlider; }
+            set { rgbGreenSlider = value; }
+        }
+
+        private int rgbBlueSlider;
+        public int RgbBlueSlider
+        {
+            get { return rgbBlueSlider; }
+            set { rgbBlueSlider = value; }
+        }
+
+
+        // high scores & stats
+
+        private int longestGame;
+        public int LongestGame
+        {
+            get { return longestGame; }
+            set { longestGame = value; }
+        }
+
+
+
+
+
     }
 }

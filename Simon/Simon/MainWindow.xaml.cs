@@ -63,10 +63,11 @@ namespace Simon
         Color yellowPressed2 = Color.FromRgb(255, 255, 0);
         Color bluePressed2 = Color.FromRgb(0, 0, 255);
 
-        //slider values need to be global.  Their positions are accessed when the start button is pressed
-        int gameSliderPosition;
-        int skillLevelSliderPosition;
-        int powerSliderPosition;
+        // background images
+        public ImageBrush woodBrush = new ImageBrush();
+        public ImageBrush graniteBrush = new ImageBrush();
+        public ImageBrush spaceBrush = new ImageBrush();
+        public SolidColorBrush rgbBrush = new SolidColorBrush();
 
         // List used to fill with random paths for random sequence of lights
         List<Path> randomPaths = new List<Path>();
@@ -94,35 +95,59 @@ namespace Simon
                 buttonHotKeys.Add(k);
             }
 
-            buttonHotKeys[0] = Key.Q;
-            buttonHotKeys[1] = Key.W;
-            buttonHotKeys[2] = Key.A;
-            buttonHotKeys[3] = Key.S;
-
             me.LoadedBehavior = MediaState.Manual;
             me.UnloadedBehavior = MediaState.Manual;
 
             // load game settings
-            if (File.Exists("saveFile.txt"))
+            if (File.Exists("SaveFile.txt"))
             {
-                // stream reader, read save file
-                StreamReader sr = new StreamReader("saveFile.txt");
+                try
+                {
+                    LoadSettings();
+                }
+                catch
+                {
+                    // if the save file fails to be read, the user probably edited it.
+                    // their file is corrupted and must be reset to defaults
+                    MessageBox.Show("Your save file has been corrupted. \nDefault Settings will be loaded.");
+                    DefaultSettings();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Your save file, \"SaveFile.txt\" is not in the \nsame folder as the game's .exe file. \n\nDefault Settings will be loaded.");
+                // set defaults for all fields in class
+                DefaultSettings();
 
-                string temp = "";
-                temp = sr.ReadLine();
-                gameSlider.Value = Int32.Parse(temp);
-                temp = sr.ReadLine();
-                skillLevelSlider.Value = Int32.Parse(temp);
-                temp = sr.ReadLine();
-                pwrSlider.Value = Int32.Parse(temp);
-
-                sr.Close();
+                SaveSettings();
             }
 
-            // slider positions
-            gameSliderPosition = Convert.ToInt32(gameSlider.Value);
-            skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
-            powerSliderPosition = Convert.ToInt32(pwrSlider.Value);
+
+            //Now must set up all items based on what is loaded into class settings
+
+            //set slider positions graphically
+            gameSlider.Value = Convert.ToDouble(MainSettings.GameSlider);
+            skillLevelSlider.Value = Convert.ToDouble(MainSettings.SkillLevelSlider);
+            pwrSlider.Value = Convert.ToDouble(MainSettings.PowerSlider);
+
+            //set key bindings from class variables
+            setkeyBindingsFromOtherWindow();
+
+            // set background.  Unfortunately this exists in both windows slightly differently
+            if (MainSettings.BackGrndWood)
+            { background.Background=woodBrush; }
+            if (MainSettings.BackGrndGranite)
+            { background.Background=graniteBrush; }
+            if (MainSettings.BackGrndSpace)
+            { background.Background=spaceBrush; }
+            if (MainSettings.BackGrndRGB)
+            {
+                Color RGBBackground = Color.FromRgb(Convert.ToByte(MainSettings.RgbRedSlider), Convert.ToByte(MainSettings.RgbGreenSlider), Convert.ToByte(MainSettings.RgbBlueSlider));
+                rgbBrush.Color = RGBBackground;
+                background.Background = rgbBrush;
+            }
+
+          
         }
 
         // button is pressed 
@@ -306,20 +331,21 @@ namespace Simon
 
         private void GameSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            gameSliderPosition = Convert.ToInt32(gameSlider.Value);
+            MainSettings.GameSlider = Convert.ToInt32(gameSlider.Value);
+            
         }
 
         private void SkillLevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
+            MainSettings.SkillLevelSlider = Convert.ToInt32(skillLevelSlider.Value);
         }
 
         private void PwrSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            powerSliderPosition = Convert.ToInt32(pwrSlider.Value);
+            MainSettings.PowerSlider = Convert.ToInt32(pwrSlider.Value);
           
             // game turned on
-            if (powerSliderPosition == 1)
+            if (MainSettings.PowerSlider == 1)
             {
                 // game is turned on
                 // make lights flash?
@@ -341,7 +367,7 @@ namespace Simon
         DispatcherTimer timeoutTimer = new DispatcherTimer();
 
         // Start the game - set up variables based on slider positions
-        private void btnStartGame(object sender, MouseButtonEventArgs e)
+        private void btnStartGame_Click (object sender, MouseButtonEventArgs e)
         {
             // set the roundTimer's properties
             roundTimer.Tick += new EventHandler(roundTimer_Tick);
@@ -355,10 +381,10 @@ namespace Simon
 
 
             // set the slider position
-            skillLevelSliderPosition = Convert.ToInt32(skillLevelSlider.Value);
+            MainSettings.SkillLevelSlider = Convert.ToInt32(skillLevelSlider.Value);
 
             // get the max number of possible rounds, store it in the global variable 
-            maxRounds = GetMaxRounds(skillLevelSliderPosition);
+            maxRounds = GetMaxRounds(MainSettings.SkillLevelSlider);
 
             // generate random numbers for order --- I think we should move this into the game class later on, under the CreateRandomList() method
             Random rand = new Random();
@@ -497,9 +523,17 @@ namespace Simon
         public void GameOver()
         {
             // stop the timer
-            timeoutTimer.Stop(); 
+            timeoutTimer.Stop();
 
             // disable all buttons <-- Do we want to do something like this? 
+
+
+            //game over sound.  Might need to be set on a timer. For this, I guess I could just recreate the audio file for the exact time length
+            me = buttonSounds[4];
+            me.Play();
+            me.Position = new TimeSpan(0);
+
+
 
             // game over
             MessageBox.Show("Game Over!"); 
@@ -511,18 +545,7 @@ namespace Simon
         // ------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------
 
-        // save button uses stream writer to write to a text file
-        private void BtnSave_Click(object sender, RoutedEventArgs e)
-        {
-            // stream reader for reading/writing info
-            StreamWriter sw = new StreamWriter("saveFile.txt");
 
-            sw.WriteLine(gameSliderPosition.ToString());
-            sw.WriteLine(skillLevelSliderPosition.ToString());
-            sw.WriteLine(powerSliderPosition.ToString());
-            
-            sw.Flush();
-        }
 
         //  open the settings window when clicked
         private void settings_Click(object sender, RoutedEventArgs e)
@@ -540,6 +563,14 @@ namespace Simon
             buttonHotKeys[3] = (Key)Enum.Parse(typeof(Key), char.ToString(MainSettings.BlueKey));
         }
 
+        public void setVolumeFromOtherWindow()
+        {
+            foreach (MediaElement m in buttonSounds)
+            {
+                m.Volume = MainSettings.VolumeSlider * .33;
+            }
+        }
+
         // open the info window when clicked
         private void info_Click(object sender, RoutedEventArgs e)
         {
@@ -552,13 +583,113 @@ namespace Simon
         // BELOW THIS PIONT USED TO SET UP VARIABLES - WILL BE CALLED ON FORM LOAD
         // ------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------
+
+        private void DefaultSettings()
+        {
+            MainSettings.GreenKey = 'Q';
+            MainSettings.RedKey = 'W';
+            MainSettings.YellowKey = 'A';
+            MainSettings.BlueKey = 'S';
+            MainSettings.GameSlider = 1;
+            MainSettings.SkillLevelSlider = 1;
+            MainSettings.PowerSlider = 0;
+            MainSettings.VolumeSlider = 3;
+            MainSettings.BackGrndWood = true;
+            MainSettings.BackGrndGranite = false;
+            MainSettings.BackGrndSpace = false;
+            MainSettings.BackGrndRGB = false;
+            MainSettings.RgbRedSlider = 192;
+            MainSettings.RgbGreenSlider = 192;
+            MainSettings.RgbBlueSlider = 192;
+            MainSettings.LongestGame = 0;
+        }
+
+        public void SaveSettings()
+        {
+            // stream reader for reading/writing info
+            StreamWriter sw = new StreamWriter("SaveFile.txt");
+
+            sw.WriteLine(MainSettings.GreenKey.ToString());
+            sw.WriteLine(MainSettings.RedKey.ToString());
+            sw.WriteLine(MainSettings.YellowKey.ToString());
+            sw.WriteLine(MainSettings.BlueKey.ToString());
+            sw.WriteLine(MainSettings.GameSlider.ToString());
+            sw.WriteLine(MainSettings.SkillLevelSlider.ToString());
+            sw.WriteLine(MainSettings.PowerSlider.ToString());
+            sw.WriteLine(MainSettings.VolumeSlider.ToString());
+            sw.WriteLine(MainSettings.BackGrndWood.ToString());
+            sw.WriteLine(MainSettings.BackGrndGranite.ToString());
+            sw.WriteLine(MainSettings.BackGrndSpace.ToString());
+            sw.WriteLine(MainSettings.BackGrndRGB.ToString());
+            sw.WriteLine(MainSettings.RgbRedSlider.ToString());
+            sw.WriteLine(MainSettings.RgbGreenSlider.ToString());
+            sw.WriteLine(MainSettings.RgbBlueSlider.ToString());
+            sw.WriteLine(MainSettings.LongestGame.ToString());
+            
+            sw.Flush();
+            sw.Close();
+
+        }
+
+        private void LoadSettings()
+        {
+
+            // stream reader, read save file
+            StreamReader sr = new StreamReader("SaveFile.txt");
+            string temp = "";
+
+            //load hot keys
+            temp = sr.ReadLine();
+            MainSettings.GreenKey = Convert.ToChar(temp);
+            temp = sr.ReadLine();
+            MainSettings.RedKey = Convert.ToChar(temp);
+            temp = sr.ReadLine();
+            MainSettings.YellowKey = Convert.ToChar(temp);
+            temp = sr.ReadLine();
+            MainSettings.BlueKey = Convert.ToChar(temp);
+
+            //load sliders
+            temp = sr.ReadLine();
+            MainSettings.GameSlider = Convert.ToInt32(temp);
+            temp = sr.ReadLine();
+            MainSettings.SkillLevelSlider = Convert.ToInt32(temp);
+            temp = sr.ReadLine();
+            MainSettings.PowerSlider = Convert.ToInt32(temp);
+            temp = sr.ReadLine();
+            MainSettings.VolumeSlider = Convert.ToInt32(temp);
+
+            //load background selections
+            temp = sr.ReadLine();
+            MainSettings.BackGrndWood = Convert.ToBoolean(temp);
+            temp = sr.ReadLine();
+            MainSettings.BackGrndGranite = Convert.ToBoolean(temp);
+            temp = sr.ReadLine();
+            MainSettings.BackGrndSpace = Convert.ToBoolean(temp);
+            temp = sr.ReadLine();
+            MainSettings.BackGrndRGB = Convert.ToBoolean(temp);
+
+            //load rgb slider locations
+            temp = sr.ReadLine();
+            MainSettings.RgbRedSlider = Convert.ToInt32(temp);
+            temp = sr.ReadLine();
+            MainSettings.RgbGreenSlider = Convert.ToInt32(temp);
+            temp = sr.ReadLine();
+            MainSettings.RgbBlueSlider = Convert.ToInt32(temp);
+
+            //load game record settings
+            temp = sr.ReadLine();
+            MainSettings.LongestGame = Convert.ToInt32(temp);
+
+            sr.Close();
+        }
+
         private void SetupTimers()
         {
             TimertoLoopBtnSounds.Tick += new EventHandler(TimertoLoopBtnSounds_Tick);
             TimertoLoopBtnSounds.Interval = new TimeSpan(0, 0, 1);
         }
 
-        private void SetupMediaElements()
+        public void SetupMediaElements()
         {
 
             // get sounds from relative filepath and add to list of mediaElement objects
@@ -591,8 +722,49 @@ namespace Simon
             sound.LoadedBehavior = MediaState.Manual;
             sound.UnloadedBehavior = MediaState.Manual;
             buttonSounds.Add(sound);
+
+            Image woodImage = new Image();
+            woodImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/woodGrain.jpg"));
+            woodBrush.ImageSource = woodImage.Source;
+
+            Image graniteImage = new Image();
+            graniteImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/granite.jpg"));
+            graniteBrush.ImageSource = graniteImage.Source;
+
+            Image spaceImage = new Image();
+            spaceImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/OuterSpace.jpg"));
+            spaceBrush.ImageSource = spaceImage.Source;
+
         }
 
 
+        private void saveMenu_click(object sender, RoutedEventArgs e)
+        {
+            SaveSettings();
+        }
+
+        private void closeMenu_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void BtnResizeWindow_Click(object sender, RoutedEventArgs e)
+        {
+            SimonMainWindow.Height = 870;
+            SimonMainWindow.Width = 870;
+        }
+
+
+        private void btnLast_Click(object sender, MouseButtonEventArgs e)
+        {
+           
+        }
+
+        private void btnLongest_Click(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+      
     }
 }

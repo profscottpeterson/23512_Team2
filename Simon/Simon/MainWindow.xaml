@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Simon"
         mc:Ignorable="d"
-        Title="Memory Game" Loaded="Window_Loaded" Height="885.334" Width="1258.667" KeyDown="ButtonPressed" KeyUp="ButtonReleased">
+        Title="Memory Game" Loaded="Window_Loaded" Height="861.334" Width="869.334" KeyDown="ButtonPressed" KeyUp="ButtonReleased">
 
     <Grid x:Name="SimonWindow">
-        <Canvas x:Name="background" x:FieldModifier="public" Margin="0,0,392,0">
+        <Canvas x:Name="background" x:FieldModifier="public" HorizontalAlignment="Stretch">
             <Canvas.Background>
                 <ImageBrush Stretch="UniformToFill"/>
             </Canvas.Background>
@@ -78,9 +78,9 @@
             <Label x:Name="skillSliderLabelNumbers" Content="1  2  3  4" Canvas.Top="439" Height="22" Width="54" Canvas.Left="461" FontSize="10"/>
             <Label x:Name="powerSliderLabelOff" Content="OFF" Canvas.Top="539" Height="22" Width="29" Canvas.Left="363" FontSize="10"/>
             <Label x:Name="powerSliderLabelOn" Content="ON" Canvas.Top="539" Height="22" Width="40" Canvas.Left="450" FontSize="10"/>
-            <Ellipse x:Name="btnLast" Cursor="Hand" Fill="Yellow" Height="26" Canvas.Left="328" Stroke="Black" StrokeThickness="2" Canvas.Top="484" Width="26"/>
-            <Ellipse x:Name="btnLongest" Cursor="Hand" Fill="Yellow" Height="26" Canvas.Left="491" Stroke="Black" StrokeThickness="2" Canvas.Top="484" Width="26"/>
-            <Ellipse x:Name="btnStart" Cursor="Hand" Fill="Red" Height="26" Canvas.Left="409" Stroke="Black" StrokeThickness="2" Canvas.Top="484" Width="26" MouseUp="btnStartGame"/>
+            <Ellipse x:Name="btnLast" Cursor="Hand" Fill="Yellow" Height="26" Canvas.Left="328" Stroke="Black" StrokeThickness="2" Canvas.Top="484" Width="26" MouseUp="btnLast_Click"/>
+            <Ellipse x:Name="btnLongest" Cursor="Hand" Fill="Yellow" Height="26" Canvas.Left="491" Stroke="Black" StrokeThickness="2" Canvas.Top="484" Width="26" MouseUp="btnLongest_Click"/>
+            <Ellipse x:Name="btnStart" Cursor="Hand" Fill="Red" Height="26" Canvas.Left="409" Stroke="Black" StrokeThickness="2" Canvas.Top="484" Width="26" MouseUp="btnStartGame_Click"/>
             <Label x:Name="btnLastLabel" Content="LAST" Canvas.Top="504" Height="22" Width="40" Canvas.Left="322" FontSize="10"/>
             <Label x:Name="btnStartLabel" Content="START" Canvas.Top="504" Height="22" Width="40" Canvas.Left="404" FontSize="10"/>
             <Label x:Name="btnLongestLabel" Content="LONGEST" Canvas.Top="504" Height="22" Width="55" Canvas.Left="479" FontSize="10"/>
@@ -89,9 +89,8 @@
         <DockPanel>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Open"/>
-                    <MenuItem Header="_Close"/>
-                    <MenuItem Header="_Save"/>
+                    <MenuItem x:Name="menu_cClose" Header="_Close" Click="closeMenu_Click"/>
+                    <MenuItem x:Name="menu_Save" Header="_Save" Click="saveMenu_click"/>
                 </MenuItem>
                 <MenuItem Header="_Options">
                     <MenuItem x:Name="settingsMenuItem" Header="Settings" Click="settings_Click"/>
@@ -103,15 +102,12 @@
             <StackPanel></StackPanel>
             <StackPanel/>
         </DockPanel>
-        <Button x:Name="btnSave" Content="Save Settings" HorizontalAlignment="Left" Margin="1012,635,0,0" VerticalAlignment="Top" Width="75" Click="BtnSave_Click"/>
+        <Label Content="Sorry, nothing out here" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1054,318,0,0"/>
+        <Button x:Name="btnResizeWindow" Content="Resize Window" HorizontalAlignment="Left" VerticalAlignment="Top" Width="133" Margin="1054,349,0,0" Height="39" Click="BtnResizeWindow_Click"/>
     </Grid>
-
-
-
 
     <!-- This is all just to get the sliders to have an image associated with them -->
     <Window.Resources>
-
         <Style x:Key="SliderThumbPower" TargetType="Thumb">
             <Setter Property="SnapsToDevicePixels" Value="true" />
             <Setter Property="OverridesDefaultStyle" Value="true" />
