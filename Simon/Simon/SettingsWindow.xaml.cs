@@ -75,6 +75,9 @@ namespace Simon
             VolSlider.Value = Convert.ToDouble(settingsWindowSettings.VolumeSlider);
 
             formIsLoaded = true;
+
+            // longest game
+            lngstGmLbl.Content = settingsWindowSettings.LongestGame;
         }
 
 

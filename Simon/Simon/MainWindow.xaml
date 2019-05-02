@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Simon"
         mc:Ignorable="d"
-        Title="Memory Game" Loaded="Window_Loaded" Height="861.334" Width="869.334" KeyDown="ButtonPressed" KeyUp="ButtonReleased">
+        Title="Memory Game" Loaded="Window_Loaded" Height="861.334" Width="869.334" KeyDown="ButtonPressed" KeyUp="ButtonReleased" Closing="ProgramClosing">
 
     <Grid x:Name="SimonWindow">
         <Canvas x:Name="background" x:FieldModifier="public" HorizontalAlignment="Stretch">

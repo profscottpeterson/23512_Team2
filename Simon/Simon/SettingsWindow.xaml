@@ -47,5 +47,7 @@
         <TextBox x:Name="txtSetYellowKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="89" Margin="101,109,0,0" KeyDown="SetKey"/>
         <TextBox x:Name="txtSetBlueKey" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="89" Margin="101,147,0,0" KeyDown="SetKey"/>
         <Button x:Name="btnConfirmKeys" Content="Confirm Custom Keys" HorizontalAlignment="Left" Margin="43,206,0,0" VerticalAlignment="Top" Width="132" Height="59" Click="BtnConfirmKeys_Click"/>
+        <Label Content="Longest Game:" HorizontalAlignment="Left" Margin="559,52,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lngstGmLbl" Content="Label" HorizontalAlignment="Left" Margin="653,52,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

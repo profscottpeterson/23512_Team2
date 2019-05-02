@@ -560,7 +560,7 @@ namespace Simon
                 ButtonDeactivated(buttonBlue);
                 ButtonDeactivated(buttonYellow);
 
-                // game over(false) means stop
+                // game over(false) means you lost, true means you won
                 GameOver(false);
             }
 
@@ -608,6 +608,11 @@ namespace Simon
                 for (int i = 0; i < currentRound; i++)
                 {
                     longestPaths.Add(randomPaths[i]);
+                }
+
+                if(longestPaths.Count>MainSettings.LongestGame)
+                {
+                    MainSettings.LongestGame = longestPaths.Count;
                 }
             }
 
@@ -1046,6 +1051,11 @@ namespace Simon
                 delaytimerLongest = null;
                 SimonWindow.IsHitTestVisible = true;
             }
+        }
+
+        private void ProgramClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            SaveSettings();
         }
     }
 }
