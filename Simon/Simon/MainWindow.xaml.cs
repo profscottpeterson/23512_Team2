@@ -44,6 +44,27 @@ namespace Simon
         // timer to repeat button sounds when button is held
         DispatcherTimer TimertoWaitForNextSequence = new DispatcherTimer();
 
+        // round dispatcher timer
+        DispatcherTimer roundTimer = new DispatcherTimer();
+
+        // delay between buttons in playback
+        DispatcherTimer delaytimer = new DispatcherTimer();
+
+        // For if user takes too long to enter sequence
+        DispatcherTimer timeoutTimer = new DispatcherTimer();
+
+
+        public int currentRound = 0;
+        public int roundIndex = 0;
+        // List used to fill with random paths for random sequence of lights
+        List<Path> randomPaths = new List<Path>();
+
+        // List for the "Last" button
+        List<Path> lastPaths = new List<Path>();
+
+        // List for the "Longest" button
+        List<Path> longestPaths = new List<Path>();
+
         // this list of keys.  User can set hot keys to press simon buttons instead of using mouse
         List<Key> buttonHotKeys = new List<Key>();
 
@@ -75,7 +96,7 @@ namespace Simon
 
 
         // Game running variables
-
+        public bool gameActive = false;
         int maxRounds;
         bool gameOver = false;
         bool outcome = false;
@@ -83,8 +104,8 @@ namespace Simon
         // window is loaded.  Create stuff
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // call setup timers method
-            SetupTimers();
+            TimertoLoopBtnSounds.Tick += new EventHandler(TimertoLoopBtnSounds_Tick);
+            TimertoLoopBtnSounds.Interval = new TimeSpan(0, 0, 1);
 
             // call setup media elements method
             SetupMediaElements();
@@ -136,11 +157,11 @@ namespace Simon
 
             // set background.  Unfortunately this exists in both windows slightly differently
             if (MainSettings.BackGrndWood)
-            { background.Background=woodBrush; }
+            { background.Background = woodBrush; }
             if (MainSettings.BackGrndGranite)
-            { background.Background=graniteBrush; }
+            { background.Background = graniteBrush; }
             if (MainSettings.BackGrndSpace)
-            { background.Background=spaceBrush; }
+            { background.Background = spaceBrush; }
             if (MainSettings.BackGrndRGB)
             {
                 Color RGBBackground = Color.FromRgb(Convert.ToByte(MainSettings.RgbRedSlider), Convert.ToByte(MainSettings.RgbGreenSlider), Convert.ToByte(MainSettings.RgbBlueSlider));
@@ -148,25 +169,25 @@ namespace Simon
                 background.Background = rgbBrush;
             }
 
-          
+
         }
 
         // button is pressed 
         private void ButtonActivated(System.Windows.Shapes.Path gameBoardButton)
         {
             // start timer
-           
+
             TimertoLoopBtnSounds.Start();
 
             if (gameBoardButton.Name == "buttonGreen")
             {
                 RadialGradientBrush r = new RadialGradientBrush(greenPressed1, greenPressed2);
                 gameBoardButton.Fill = r;
-                me = buttonSounds[0];   
+                me = buttonSounds[0];
 
                 if (timeoutTimer.IsEnabled)
-               {
-                   CheckCorrectButton("buttonGreen");
+                {
+                    CheckCorrectButton("buttonGreen");
                 }
             }
 
@@ -176,9 +197,9 @@ namespace Simon
                 gameBoardButton.Fill = r;
                 me = buttonSounds[1];
 
-                  if (timeoutTimer.IsEnabled)
+                if (timeoutTimer.IsEnabled)
                 {
-                 CheckCorrectButton("buttonRed");
+                    CheckCorrectButton("buttonRed");
                 }
             }
 
@@ -188,7 +209,7 @@ namespace Simon
                 gameBoardButton.Fill = r;
                 me = buttonSounds[2];
 
-                 if (timeoutTimer.IsEnabled)
+                if (timeoutTimer.IsEnabled)
                 {
                     CheckCorrectButton("buttonYellow");
                 }
@@ -200,7 +221,7 @@ namespace Simon
                 gameBoardButton.Fill = r;
                 me = buttonSounds[3];
 
-                 if (timeoutTimer.IsEnabled)
+                if (timeoutTimer.IsEnabled)
                 {
                     CheckCorrectButton("buttonBlue");
                 }
@@ -217,7 +238,6 @@ namespace Simon
                 gameBoardButton.Fill = b;
                 TimertoLoopBtnSounds.Stop();
 
-               
             }
 
             if (gameBoardButton.Name == "buttonRed")
@@ -226,7 +246,6 @@ namespace Simon
                 gameBoardButton.Fill = b;
                 TimertoLoopBtnSounds.Stop();
 
-              
             }
 
             if (gameBoardButton.Name == "buttonYellow")
@@ -235,7 +254,6 @@ namespace Simon
                 gameBoardButton.Fill = b;
                 TimertoLoopBtnSounds.Stop();
 
-               
             }
 
             if (gameBoardButton.Name == "buttonBlue")
@@ -244,10 +262,13 @@ namespace Simon
                 gameBoardButton.Fill = b;
                 TimertoLoopBtnSounds.Stop();
 
-               
-
             }
-            me.Stop();
+
+            if (me != buttonSounds[4])
+            {
+                me.Stop();
+            }
+            
         }
 
         // When the button sound loop timer finishes, set the media's position and replay
@@ -255,6 +276,7 @@ namespace Simon
         {
             me.Position = new TimeSpan(0, 0, 0, 0, 500);
             me.Play();
+            
         }
 
         // event handler for pressing button (clicking mouse)
@@ -314,10 +336,10 @@ namespace Simon
                 }
             }
         }
-   
+
         // This is the event handler for key up
         private void ButtonReleased(object sender, KeyEventArgs e)
-        {         
+        {
             if (buttonHotKeys[0] == e.Key)
             {
                 ButtonDeactivated(buttonGreen);
@@ -342,7 +364,7 @@ namespace Simon
         private void GameSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MainSettings.GameSlider = Convert.ToInt32(gameSlider.Value);
-            
+
         }
 
         private void SkillLevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -353,7 +375,7 @@ namespace Simon
         private void PwrSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MainSettings.PowerSlider = Convert.ToInt32(pwrSlider.Value);
-          
+
             // game turned on
             if (MainSettings.PowerSlider == 1)
             {
@@ -369,46 +391,35 @@ namespace Simon
         // ------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------
 
-        // round dispatcher timer
-        DispatcherTimer roundTimer = new DispatcherTimer();
-        DispatcherTimer delaytimer = new DispatcherTimer();
-         DispatcherTimer timeoutTimer = new DispatcherTimer();
-
-        // time-out timer
-       
-
-       public int currentRound=0;
-        public int roundIndex=0;
-        // List used to fill with random paths for random sequence of lights
-        List<Path> randomPaths = new List<Path>();
-
         // Start the game - set up variables based on slider positions
-        private void btnStartGame_Click (object sender, MouseButtonEventArgs e)
+        private void btnStartGame_Click(object sender, MouseButtonEventArgs e)
         {
-            btnStart.IsEnabled=false;
+            
 
-            randomPaths = new List<Path>();  
+            btnStart.IsEnabled = false;
+
+            randomPaths = new List<Path>();
             roundTimer = new DispatcherTimer();
             delaytimer = new DispatcherTimer();
             TimertoWaitForNextSequence = new DispatcherTimer();
 
             // time-out timer
             timeoutTimer = new DispatcherTimer();
-        
-            currentRound=0;
-            roundIndex=0;
+
+            currentRound = 0;
+            roundIndex = 0;
             timeoutTimer.Stop();
             roundTimer.Stop();
             delaytimer.Stop();
             TimertoWaitForNextSequence.Stop();
-            
+
             // set the roundTimer's properties  - this is how long the cpu plays the button, 420 ms sequence length <=5, 320ms sequence length <=13, 220ms <=31
             roundTimer.Tick += new EventHandler(roundTimer_Tick);
             roundTimer.Interval = new TimeSpan(0, 0, 0, 0, 420);
 
 
             delaytimer.Tick += new EventHandler(delayTimer_Tick);
-            delaytimer.Interval= new TimeSpan(0, 0, 0, 0, 50);
+            delaytimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
 
             // timer to end the game if user takes too long
             timeoutTimer.Tick += new EventHandler(timeoutTimer_Tick);
@@ -416,10 +427,6 @@ namespace Simon
 
             TimertoWaitForNextSequence.Tick += new EventHandler(TimertoWaitForNextSequence_Tick);
             TimertoWaitForNextSequence.Interval = new TimeSpan(0, 0, 0, 0, 800);
-
-
-            // set the slider position
-            MainSettings.SkillLevelSlider = Convert.ToInt32(skillLevelSlider.Value);
 
             // get the max number of possible rounds, store it in the global variable 
             maxRounds = GetMaxRounds(MainSettings.SkillLevelSlider);
@@ -458,7 +465,7 @@ namespace Simon
             }
 
             // while it is not game over, run the round code
-             Round();
+            Round();
         }
 
         // will return the maximum number of rounds
@@ -468,7 +475,7 @@ namespace Simon
 
             if (lvl == 1)
             {
-                m = 8;
+                m = 5;
             }
             else if (lvl == 2)
             {
@@ -486,21 +493,18 @@ namespace Simon
             return m;
         }
 
-         
 
         // code that runs during each round
         public void Round()
         {
-          
-            
             // resets round index
             roundIndex = 0;
 
             // increment currentRound
             currentRound++;
-           
+
             roundTimer.Start();
-            ButtonActivated(randomPaths[roundIndex]); 
+            ButtonActivated(randomPaths[roundIndex]);
         }
 
         private void roundTimer_Tick(object sender, EventArgs e)
@@ -517,7 +521,7 @@ namespace Simon
         {
             delaytimer.Stop();
 
-            if (roundIndex!=currentRound)
+            if (roundIndex != currentRound)
             {
                 roundTimer.Start();
                 ButtonActivated(randomPaths[roundIndex]);
@@ -528,7 +532,7 @@ namespace Simon
                 timeoutTimer.Start();
 
                 // reset the roundIndex
-                roundIndex = 0; 
+                roundIndex = 0;
             }
         }
 
@@ -537,17 +541,17 @@ namespace Simon
         {
             timeoutTimer.Stop();
 
-            GameOver(); 
-            
+            GameOver(false);
+
         }
 
-        public void CheckCorrectButton (string b)
+        public void CheckCorrectButton(string b)
         {
             if (b == randomPaths[roundIndex].Name)
             {
                 timeoutTimer.Stop();
                 timeoutTimer.Start();
-                roundIndex++; 
+                roundIndex++;
             }
             else
             {
@@ -556,36 +560,66 @@ namespace Simon
                 ButtonDeactivated(buttonBlue);
                 ButtonDeactivated(buttonYellow);
 
-                GameOver(); 
+                // game over(false) means stop
+                GameOver(false);
             }
 
             if (roundIndex == currentRound)
             {
                 timeoutTimer.Stop();
                 TimertoWaitForNextSequence.Start();
-                
+
             }
         }
 
-         private void TimertoWaitForNextSequence_Tick(object sender, EventArgs e)
+        private void TimertoWaitForNextSequence_Tick(object sender, EventArgs e)
         {
-            Round(); 
-             TimertoWaitForNextSequence.Stop();            
+            if (currentRound < maxRounds)
+            {
+                Round();
+                TimertoWaitForNextSequence.Stop();
+            }
+
+            else
+            {
+                TimertoWaitForNextSequence.Stop();
+                GameOver(true);
+            }
         }
 
 
         // method that holds the game over code
-        public void GameOver()
+        public void GameOver(bool won)
         {
-           btnStart.IsEnabled=true;
-  
-            currentRound=0;
-            roundIndex=0;
+            
+
+            btnStart.IsEnabled = true;
+
+            lastPaths.Clear();
+            // add to list of last paths
+            for (int i = 0; i < currentRound; i++)
+            {
+                lastPaths.Add(randomPaths[i]);
+            }
+
+            if (lastPaths.Count > longestPaths.Count)
+            {
+                longestPaths.Clear();
+                for (int i = 0; i < currentRound; i++)
+                {
+                    longestPaths.Add(randomPaths[i]);
+                }
+            }
+
+            SimonWindow.IsHitTestVisible = false;
+
+            currentRound = 0;
+            roundIndex = 0;
 
             // stop the timer
             timeoutTimer.Stop();
-            timeoutTimer.Tick-=timeoutTimer_Tick;
-            timeoutTimer=null;
+            timeoutTimer.Tick -= timeoutTimer_Tick;
+            timeoutTimer = null;
 
             roundTimer.Stop();
             roundTimer.Tick -= roundTimer_Tick;
@@ -595,36 +629,43 @@ namespace Simon
             delaytimer.Tick -= delayTimer_Tick;
             delaytimer = null;
 
-            
             TimertoWaitForNextSequence.Stop();
             TimertoWaitForNextSequence.Tick -= TimertoWaitForNextSequence_Tick;
             TimertoWaitForNextSequence = null;
 
-             roundTimer = new DispatcherTimer();
-             delaytimer = new DispatcherTimer();
+            roundTimer = new DispatcherTimer();
+            delaytimer = new DispatcherTimer();
 
-        // time-out timer
-             timeoutTimer = new DispatcherTimer();
+            // time-out timer
+            timeoutTimer = new DispatcherTimer();
             TimertoWaitForNextSequence = new DispatcherTimer();
 
             // disable all buttons <-- Do we want to do something like this? 
 
-          //  ButtonDeactivated(buttonRed);
-          //  ButtonDeactivated(buttonGreen);
-          //  ButtonDeactivated(buttonBlue);
-          //  ButtonDeactivated(buttonYellow);
+            //  ButtonDeactivated(buttonRed);
+            //  ButtonDeactivated(buttonGreen);
+            //  ButtonDeactivated(buttonBlue);
+            //  ButtonDeactivated(buttonYellow);
 
-            //game over sound.  Might need to be set on a timer. For this, I guess I could just recreate the audio file for the exact time length
-            me = buttonSounds[4];
-            me.Play();
-            me.Position = new TimeSpan(0);
+            if (won == true)
+            {
+                MessageBox.Show("You've won!");
+            }
 
+            else
+            {
+                //game over sound.  Might need to be set on a timer. For this, I guess I could just recreate the audio file for the exact time length
+                me = buttonSounds[4];
+                me.Play();
+                me.Position = new TimeSpan(0);
+            }
 
-
-            // game over
-          // MessageBox.Show("Game Over!");
 
             
+            
+           
+            SimonWindow.IsHitTestVisible = true;
+
         }
 
         // ------------------------------------------------------------------------------------------------
@@ -713,7 +754,7 @@ namespace Simon
             sw.WriteLine(MainSettings.RgbGreenSlider.ToString());
             sw.WriteLine(MainSettings.RgbBlueSlider.ToString());
             sw.WriteLine(MainSettings.LongestGame.ToString());
-            
+
             sw.Flush();
             sw.Close();
 
@@ -771,14 +812,6 @@ namespace Simon
             sr.Close();
         }
 
-        private void SetupTimers()
-        {
-            TimertoLoopBtnSounds.Tick += new EventHandler(TimertoLoopBtnSounds_Tick);
-            TimertoLoopBtnSounds.Interval = new TimeSpan(0, 0, 1);
-
-            
-        }
-
         public void SetupMediaElements()
         {
 
@@ -824,9 +857,7 @@ namespace Simon
             Image spaceImage = new Image();
             spaceImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/OuterSpace.jpg"));
             spaceBrush.ImageSource = spaceImage.Source;
-
         }
-
 
         private void saveMenu_click(object sender, RoutedEventArgs e)
         {
@@ -844,17 +875,177 @@ namespace Simon
             SimonMainWindow.Width = 870;
         }
 
+        DispatcherTimer roundTimerLast = new DispatcherTimer();
+        DispatcherTimer delaytimerLast = new DispatcherTimer();
 
         private void btnLast_Click(object sender, MouseButtonEventArgs e)
         {
-           
+            if (lastPaths.Count > 0)
+            {
+
+                SimonWindow.IsHitTestVisible = false;
+
+                roundTimerLast = new DispatcherTimer();
+                delaytimerLast = new DispatcherTimer();
+
+                currentRound = 0;
+                roundIndex = 0;
+
+                roundTimerLast.Stop();
+                delaytimerLast.Stop();
+
+
+                // set the roundTimer's properties  - this is how long the cpu plays the button, 420 ms sequence length <=5, 320ms sequence length <=13, 220ms <=31
+                roundTimerLast.Tick += new EventHandler(roundTimerLast_Tick);
+                roundTimerLast.Interval = new TimeSpan(0, 0, 0, 0, 420);
+
+
+                delaytimerLast.Tick += new EventHandler(delayTimerLast_Tick);
+                delaytimerLast.Interval = new TimeSpan(0, 0, 0, 0, 50);
+
+
+                // get the max number of possible rounds, store it in the global variable 
+                maxRounds = lastPaths.Count;
+
+                // while it is not game over, run the round code
+                RoundLast();
+            }
         }
 
+        // will return the maximum number of rounds
+
+
+        // code that runs during each round
+        public void RoundLast()
+        {
+            // resets round index
+            roundIndex = 0;
+
+            // increment currentRound
+            currentRound++;
+
+            roundTimerLast.Start();
+            ButtonActivated(lastPaths[roundIndex]);
+        }
+
+        private void roundTimerLast_Tick(object sender, EventArgs e)
+        {
+            roundTimerLast.Stop();
+            ButtonDeactivated(lastPaths[roundIndex]);
+            roundIndex++;
+
+            //put delay timer here
+            delaytimerLast.Start();
+        }
+
+        private void delayTimerLast_Tick(object sender, EventArgs e)
+        {
+            delaytimerLast.Stop();
+
+            roundTimerLast.Start();
+
+            if (roundIndex < maxRounds)
+            {
+                ButtonActivated(lastPaths[roundIndex]);
+            }
+            else
+            {
+                roundTimerLast.Stop();
+                roundTimerLast.Tick -= roundTimerLast_Tick;
+                roundTimerLast = null;
+
+                delaytimerLast.Stop();
+                delaytimerLast.Tick -= delayTimerLast_Tick;
+                delaytimerLast = null;
+                SimonWindow.IsHitTestVisible = true;
+            }
+
+        }
+
+
+
+        DispatcherTimer roundTimerLongest = new DispatcherTimer();
+        DispatcherTimer delaytimerLongest = new DispatcherTimer();
         private void btnLongest_Click(object sender, MouseButtonEventArgs e)
         {
 
+            if (longestPaths.Count > 0)
+            {
+                SimonWindow.IsHitTestVisible = false;
+
+                roundTimerLongest = new DispatcherTimer();
+                delaytimerLongest = new DispatcherTimer();
+
+                currentRound = 0;
+                roundIndex = 0;
+
+                roundTimerLongest.Stop();
+                delaytimerLongest.Stop();
+
+
+                // set the roundTimer's properties  - this is how long the cpu plays the button, 420 ms sequence length <=5, 320ms sequence length <=13, 220ms <=31
+                roundTimerLongest.Tick += new EventHandler(roundTimerLongest_Tick);
+                roundTimerLongest.Interval = new TimeSpan(0, 0, 0, 0, 420);
+
+
+                delaytimerLongest.Tick += new EventHandler(delayTimerLongest_Tick);
+                delaytimerLongest.Interval = new TimeSpan(0, 0, 0, 0, 50);
+
+
+                // get the max number of possible rounds, store it in the global variable 
+                maxRounds = longestPaths.Count;
+
+                // while it is not game over, run the round code
+                RoundLongest();
+            }
         }
 
-      
+
+
+        // code that runs during each round
+        public void RoundLongest()
+        {
+            // resets round index
+            roundIndex = 0;
+
+            // increment currentRound
+            currentRound++;
+
+            roundTimerLongest.Start();
+            ButtonActivated(longestPaths[roundIndex]);
+        }
+
+        private void roundTimerLongest_Tick(object sender, EventArgs e)
+        {
+            roundTimerLongest.Stop();
+            ButtonDeactivated(longestPaths[roundIndex]);
+            roundIndex++;
+
+            //put delay timer here
+            delaytimerLongest.Start();
+        }
+
+        private void delayTimerLongest_Tick(object sender, EventArgs e)
+        {
+            delaytimerLongest.Stop();
+
+            roundTimerLongest.Start();
+
+            if (roundIndex < maxRounds)
+            {
+                ButtonActivated(longestPaths[roundIndex]);
+            }
+            else
+            {
+                roundTimerLongest.Stop();
+                roundTimerLongest.Tick -= roundTimerLongest_Tick;
+                roundTimerLongest = null;
+
+                delaytimerLongest.Stop();
+                delaytimerLongest.Tick -= delayTimerLongest_Tick;
+                delaytimerLongest = null;
+                SimonWindow.IsHitTestVisible = true;
+            }
+        }
     }
 }
