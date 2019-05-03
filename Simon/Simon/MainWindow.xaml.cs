@@ -59,6 +59,8 @@ namespace Simon
         // List used to fill with random paths for random sequence of lights
         List<Path> randomPaths = new List<Path>();
 
+        List<Path> randomPaths2 = new List<Path>();
+
         // List for the "Last" button
         List<Path> lastPaths = new List<Path>();
 
@@ -93,15 +95,23 @@ namespace Simon
         public ImageBrush spaceBrush = new ImageBrush();
         public SolidColorBrush rgbBrush = new SolidColorBrush();
 
-
-
         // Game running variables
         public bool gameActive = false;
         int maxRounds;
         bool gameOver = false;
         bool outcome = false;
+
+        // The game slider value will be assigned to this when the start button is pressed
+        int gameType = -1;
+
         // need to prevent double selection on mouse unclick and mouse unhover
         bool btnHasBeenPressed = false;
+
+        // this has to do with game 3.  In Game 3, if the wrong color is selected, the game continues with a new sequence (without that color) until only one color is left
+        bool greenIsPlaying = true;
+        bool redIsPlaying = true;
+        bool yellowIsPlaying = true;
+        bool blueIsPlaying = true;
 
         // window is loaded.  Create stuff
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -170,8 +180,6 @@ namespace Simon
                 rgbBrush.Color = RGBBackground;
                 background.Background = rgbBrush;
             }
-
-
         }
 
         // button is pressed 
@@ -290,7 +298,6 @@ namespace Simon
         {
             me.Position = new TimeSpan(0, 0, 0, 0, 500);
             me.Play();
-            
         }
 
         // event handler for pressing button (clicking mouse)
@@ -365,8 +372,6 @@ namespace Simon
         // This is the event handler for key up
         private void ButtonReleased(object sender, KeyEventArgs e)
         {
-            
-
             if (buttonHotKeys[0] == e.Key)
             {
                 ButtonDeactivated(buttonGreen,true);
@@ -393,7 +398,6 @@ namespace Simon
         private void GameSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MainSettings.GameSlider = Convert.ToInt32(gameSlider.Value);
-
         }
 
         private void SkillLevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -423,6 +427,11 @@ namespace Simon
         // Start the game - set up variables based on slider positions
         private void btnStartGame_Click(object sender, MouseButtonEventArgs e)
         {
+            greenIsPlaying = true;
+            blueIsPlaying = true;
+            redIsPlaying = true;
+            yellowIsPlaying = true;
+
 
             gameActive = true;
             btnStart.IsEnabled = false;
@@ -459,6 +468,8 @@ namespace Simon
 
             // get the max number of possible rounds, store it in the global variable 
             maxRounds = GetMaxRounds(MainSettings.SkillLevelSlider);
+
+            gameType = MainSettings.GameSlider;
 
             // generate random numbers for order --- I think we should move this into the game class later on, under the CreateRandomList() method
             Random rand = new Random();
@@ -578,23 +589,110 @@ namespace Simon
 
         public void CheckCorrectButton(string b)
         {
+            bool nextRoundBegun = false;
+
             if (b == randomPaths[roundIndex].Name)
             {
-
                 roundIndex++;
             }
+
             else
             {
-                // game over(false) means you lost, true means you won
-                GameOver(false);
+                int numColorsRemaining = 0;
+                
+                if (gameType == 3)
+                {
+                    if (b == "buttonGreen")
+                    { greenIsPlaying = false; }
+                    if (b == "buttonRed")
+                    { redIsPlaying = false; }
+                    if (b == "buttonYellow")
+                    { yellowIsPlaying = false; }
+                    if (b == "buttonBlue")
+                    { blueIsPlaying = false; }
+
+
+                    if (greenIsPlaying == true)
+                    { numColorsRemaining++; }
+                    if (redIsPlaying == true)
+                    { numColorsRemaining++; }
+                    if (yellowIsPlaying == true)
+                    { numColorsRemaining++; }
+                    if (blueIsPlaying == true)
+                    { numColorsRemaining++; }
+
+                    if(numColorsRemaining<2)
+                    { GameOver(false); }
+
+                    Random rand = new Random();
+
+                    randomPaths2.Clear();
+                    //create list of random paths to be passed into button pressed/button released methods
+                    while(randomPaths2.Count<maxRounds)
+                    {
+                        bool pathSuccess = false;
+
+                        Path p = new Path();
+
+                        int tempRandom = rand.Next(0, 4);
+
+                        if (tempRandom == 0 & greenIsPlaying)
+                        {
+                            p = buttonGreen;
+                            pathSuccess = true;
+                        }
+                         
+                        if (tempRandom == 1 & redIsPlaying)
+                        {
+                            p = buttonRed;
+                            pathSuccess = true;
+                        }
+
+                        if (tempRandom == 2 & yellowIsPlaying)
+                        {
+                            p = buttonYellow;
+                            pathSuccess = true;
+                        }
+
+                        if (tempRandom == 3 & blueIsPlaying)
+                        {
+                            p = buttonBlue;
+                            pathSuccess = true;
+                        }
+
+                        if (pathSuccess == true)
+                        {
+                            randomPaths2.Add(p);
+                        }
+                    }
+
+                    randomPaths = randomPaths2;
+
+                    currentRound--;
+
+                    TimertoWaitForNextSequence.Stop();
+                    
+                    TimertoWaitForNextSequence.Start();
+
+                    nextRoundBegun = true;
+                }
+               
+
+                if (gameType != 3)
+                {
+                    // game over(false) means you lost, true means you won
+                    GameOver(false);
+                }
             }
 
             if (roundIndex == currentRound)
             {
-
-                TimertoWaitForNextSequence.Start();
-                
-
+                if (nextRoundBegun == false)
+                {
+                    
+                        
+                    TimertoWaitForNextSequence.Start();
+                }
             }
         }
 
@@ -620,7 +718,7 @@ namespace Simon
         {
             ButtonDeactivated(buttonRed,false);
             ButtonDeactivated(buttonGreen,false);
-             ButtonDeactivated(buttonBlue,false);
+            ButtonDeactivated(buttonBlue,false);
             ButtonDeactivated(buttonYellow,false);
 
             gameActive = false;
