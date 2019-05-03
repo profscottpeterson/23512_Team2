@@ -100,6 +100,8 @@ namespace Simon
         int maxRounds;
         bool gameOver = false;
         bool outcome = false;
+        // need to prevent double selection on mouse unclick and mouse unhover
+        bool btnHasBeenPressed = false;
 
         // window is loaded.  Create stuff
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -185,10 +187,6 @@ namespace Simon
                 gameBoardButton.Fill = r;
                 me = buttonSounds[0];
 
-                if (timeoutTimer.IsEnabled)
-                {
-                    CheckCorrectButton("buttonGreen");
-                }
             }
 
             if (gameBoardButton.Name == "buttonRed")
@@ -197,10 +195,7 @@ namespace Simon
                 gameBoardButton.Fill = r;
                 me = buttonSounds[1];
 
-                if (timeoutTimer.IsEnabled)
-                {
-                    CheckCorrectButton("buttonRed");
-                }
+                
             }
 
             if (gameBoardButton.Name == "buttonYellow")
@@ -209,10 +204,6 @@ namespace Simon
                 gameBoardButton.Fill = r;
                 me = buttonSounds[2];
 
-                if (timeoutTimer.IsEnabled)
-                {
-                    CheckCorrectButton("buttonYellow");
-                }
             }
 
             if (gameBoardButton.Name == "buttonBlue")
@@ -221,54 +212,77 @@ namespace Simon
                 gameBoardButton.Fill = r;
                 me = buttonSounds[3];
 
-                if (timeoutTimer.IsEnabled)
-                {
-                    CheckCorrectButton("buttonBlue");
-                }
             }
             me.Play();
         }
 
         // button is released - called in event handlers mouse hovers off, mouse unclicked, key press up
-        private void ButtonDeactivated(System.Windows.Shapes.Path gameBoardButton)
+        private void ButtonDeactivated(System.Windows.Shapes.Path gameBoardButton, bool humanInput)
         {
-            if (gameBoardButton.Name == "buttonGreen")
-            {
-                SolidColorBrush b = new SolidColorBrush(greenUnPressed);
-                gameBoardButton.Fill = b;
-                TimertoLoopBtnSounds.Stop();
 
-            }
+                if (gameBoardButton.Name == "buttonGreen")
+                {
+                    SolidColorBrush b = new SolidColorBrush(greenUnPressed);
+                    gameBoardButton.Fill = b;
+                    TimertoLoopBtnSounds.Stop();
 
-            if (gameBoardButton.Name == "buttonRed")
-            {
-                SolidColorBrush b = new SolidColorBrush(redUnPressed);
-                gameBoardButton.Fill = b;
-                TimertoLoopBtnSounds.Stop();
+                    if (gameActive == true & humanInput == true)
+                    {
+                        CheckCorrectButton("buttonGreen");
+                    }
 
-            }
+                }
 
-            if (gameBoardButton.Name == "buttonYellow")
-            {
-                SolidColorBrush b = new SolidColorBrush(yellowUnPressed);
-                gameBoardButton.Fill = b;
-                TimertoLoopBtnSounds.Stop();
+                if (gameBoardButton.Name == "buttonRed")
+                {
+                    SolidColorBrush b = new SolidColorBrush(redUnPressed);
+                    gameBoardButton.Fill = b;
+                    TimertoLoopBtnSounds.Stop();
 
-            }
+                    if (gameActive == true & humanInput == true)
+                    {
+                        CheckCorrectButton("buttonRed");
+                    }
 
-            if (gameBoardButton.Name == "buttonBlue")
-            {
-                SolidColorBrush b = new SolidColorBrush(blueUnPressed);
-                gameBoardButton.Fill = b;
-                TimertoLoopBtnSounds.Stop();
+                }
 
-            }
+                if (gameBoardButton.Name == "buttonYellow")
+                {
+                    SolidColorBrush b = new SolidColorBrush(yellowUnPressed);
+                    gameBoardButton.Fill = b;
+                    TimertoLoopBtnSounds.Stop();
 
-            if (me != buttonSounds[4])
-            {
-                me.Stop();
-            }
-            
+                    if (gameActive == true & humanInput == true)
+                    {
+                        CheckCorrectButton("buttonYellow");
+                    }
+
+                }
+
+                if (gameBoardButton.Name == "buttonBlue")
+                {
+                    SolidColorBrush b = new SolidColorBrush(blueUnPressed);
+                    gameBoardButton.Fill = b;
+                    TimertoLoopBtnSounds.Stop();
+
+                    if (gameActive == true & humanInput == true)
+                    {
+                        CheckCorrectButton("buttonBlue");
+                    }
+
+                }
+
+                if (gameActive == true & humanInput == true)
+                {
+                    timeoutTimer.Stop();
+                    timeoutTimer.Start();
+                    
+                }
+
+                if (me != buttonSounds[4])
+                {
+                    me.Stop();
+                }
         }
 
         // When the button sound loop timer finishes, set the media's position and replay
@@ -287,6 +301,9 @@ namespace Simon
             gameBoardButton = e.Source as Path;
 
             ButtonActivated(gameBoardButton);
+
+            btnHasBeenPressed = true;
+           
         }
 
         // event handler for releasing mouse button
@@ -296,22 +313,30 @@ namespace Simon
 
             gameBoardButton = e.Source as Path;
 
-            ButtonDeactivated(gameBoardButton);
+            ButtonDeactivated(gameBoardButton,true);
+
+            btnHasBeenPressed = false;
         }
 
         // event handler for hovering your mouse off of button
         private void ButtonReleased(object sender, MouseEventArgs e)
         {
-            Path gameBoardButton = new Path();
+            if (btnHasBeenPressed == true)
+            {
+                Path gameBoardButton = new Path();
 
-            gameBoardButton = e.Source as Path;
+                gameBoardButton = e.Source as Path;
 
-            ButtonDeactivated(gameBoardButton);
+                ButtonDeactivated(gameBoardButton, true);
+                btnHasBeenPressed = false;
+            }       
         }
 
         // this is the event handler for key down
         private void ButtonPressed(object sender, KeyEventArgs e)
         {
+            SimonWindow.IsHitTestVisible = false;
+            
             // if this if statment isn't here, the audio won't repeat
             if (!e.IsRepeat)
             {
@@ -340,25 +365,29 @@ namespace Simon
         // This is the event handler for key up
         private void ButtonReleased(object sender, KeyEventArgs e)
         {
+            
+
             if (buttonHotKeys[0] == e.Key)
             {
-                ButtonDeactivated(buttonGreen);
+                ButtonDeactivated(buttonGreen,true);
             }
 
             if (buttonHotKeys[1] == e.Key)
             {
-                ButtonDeactivated(buttonRed);
+                ButtonDeactivated(buttonRed,true);
             }
 
             if (buttonHotKeys[2] == e.Key)
             {
-                ButtonDeactivated(buttonYellow);
+                ButtonDeactivated(buttonYellow,true);
             }
 
             if (buttonHotKeys[3] == e.Key)
             {
-                ButtonDeactivated(buttonBlue);
+                ButtonDeactivated(buttonBlue,true);
             }
+
+            SimonWindow.IsHitTestVisible = true;
         }
 
         private void GameSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -394,8 +423,8 @@ namespace Simon
         // Start the game - set up variables based on slider positions
         private void btnStartGame_Click(object sender, MouseButtonEventArgs e)
         {
-            
 
+            gameActive = true;
             btnStart.IsEnabled = false;
 
             randomPaths = new List<Path>();
@@ -497,6 +526,8 @@ namespace Simon
         // code that runs during each round
         public void Round()
         {
+            SimonWindow.IsHitTestVisible = false;
+            
             // resets round index
             roundIndex = 0;
 
@@ -510,7 +541,8 @@ namespace Simon
         private void roundTimer_Tick(object sender, EventArgs e)
         {
             roundTimer.Stop();
-            ButtonDeactivated(randomPaths[roundIndex]);
+            ButtonDeactivated(randomPaths[roundIndex],false);
+            timeoutTimer.Start();
             roundIndex++;
 
             //put delay timer here
@@ -525,21 +557,20 @@ namespace Simon
             {
                 roundTimer.Start();
                 ButtonActivated(randomPaths[roundIndex]);
+                timeoutTimer.Stop();
+                
             }
             else
             {
-                // start time-out timer
-                timeoutTimer.Start();
-
                 // reset the roundIndex
                 roundIndex = 0;
+                SimonWindow.IsHitTestVisible = true;
             }
         }
 
         // 3 second timer that checks for game over
         private void timeoutTimer_Tick(object sender, EventArgs e)
         {
-            timeoutTimer.Stop();
 
             GameOver(false);
 
@@ -549,25 +580,20 @@ namespace Simon
         {
             if (b == randomPaths[roundIndex].Name)
             {
-                timeoutTimer.Stop();
-                timeoutTimer.Start();
+
                 roundIndex++;
             }
             else
             {
-                ButtonDeactivated(buttonRed);
-                ButtonDeactivated(buttonGreen);
-                ButtonDeactivated(buttonBlue);
-                ButtonDeactivated(buttonYellow);
-
                 // game over(false) means you lost, true means you won
                 GameOver(false);
             }
 
             if (roundIndex == currentRound)
             {
-                timeoutTimer.Stop();
+
                 TimertoWaitForNextSequence.Start();
+                
 
             }
         }
@@ -585,13 +611,19 @@ namespace Simon
                 TimertoWaitForNextSequence.Stop();
                 GameOver(true);
             }
+           
         }
 
 
         // method that holds the game over code
         public void GameOver(bool won)
         {
-            
+            ButtonDeactivated(buttonRed,false);
+            ButtonDeactivated(buttonGreen,false);
+             ButtonDeactivated(buttonBlue,false);
+            ButtonDeactivated(buttonYellow,false);
+
+            gameActive = false;
 
             btnStart.IsEnabled = true;
 
@@ -647,10 +679,7 @@ namespace Simon
 
             // disable all buttons <-- Do we want to do something like this? 
 
-            //  ButtonDeactivated(buttonRed);
-            //  ButtonDeactivated(buttonGreen);
-            //  ButtonDeactivated(buttonBlue);
-            //  ButtonDeactivated(buttonYellow);
+            
 
             if (won == true)
             {
@@ -936,7 +965,7 @@ namespace Simon
         private void roundTimerLast_Tick(object sender, EventArgs e)
         {
             roundTimerLast.Stop();
-            ButtonDeactivated(lastPaths[roundIndex]);
+            ButtonDeactivated(lastPaths[roundIndex],false);
             roundIndex++;
 
             //put delay timer here
@@ -1023,7 +1052,7 @@ namespace Simon
         private void roundTimerLongest_Tick(object sender, EventArgs e)
         {
             roundTimerLongest.Stop();
-            ButtonDeactivated(longestPaths[roundIndex]);
+            ButtonDeactivated(longestPaths[roundIndex],false);
             roundIndex++;
 
             //put delay timer here
