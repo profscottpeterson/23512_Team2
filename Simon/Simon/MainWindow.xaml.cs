@@ -633,11 +633,14 @@ namespace Simon
                 if (b == randomPaths[roundIndex].Name)
                 {
                     roundIndex++;
-                    
+                if (gameType == 2)
+                {
+                    if (roundIndex == maxRounds - 1)
+                    { GameOver(true); }
                 }
 
-            
-            
+                }
+
                 else
                 {
                     int numColorsRemaining = 0;
