@@ -53,6 +53,9 @@ namespace Simon
         // For if user takes too long to enter sequence
         DispatcherTimer timeoutTimer = new DispatcherTimer();
 
+        //For time between buttons in the win sequence
+        DispatcherTimer winSequenceTimer = new DispatcherTimer();
+
 
         public int currentRound = 0;
         public int roundIndex = 0;
@@ -180,7 +183,57 @@ namespace Simon
                 rgbBrush.Color = RGBBackground;
                 background.Background = rgbBrush;
             }
+           
         }
+
+        //Sets up the win sequence and plays it
+        int winSequenceIndex = 0;
+        public void playWinSequence()
+        {
+            winSequenceTimer = new System.Windows.Threading.DispatcherTimer();
+            winSequenceTimer.Tick += new EventHandler(winSequenceTimer_Tick);
+            winSequenceTimer.Interval = new TimeSpan(0, 0, 0, 0, 220);
+            winSequenceTimer.Start();
+        }
+
+        //sets up consecutive timer ticks for win sequence
+        private void winSequenceTimer_Tick(object sender, EventArgs e)
+        {
+            //deactivates buttons at beginning of the tick
+            ButtonDeactivated(buttonYellow, false);
+            ButtonDeactivated(buttonBlue, false);
+            ButtonDeactivated(buttonGreen, false);
+            ButtonDeactivated(buttonRed, false);
+
+            //plays the sequence... Feel free to customize 
+            switch (winSequenceIndex)
+            {
+                case 0:
+                    ButtonActivated(buttonGreen);
+                    break;
+                case 1:
+                    ButtonActivated(buttonRed);
+                    break;
+                case 2:
+                    ButtonActivated(buttonYellow);
+                    break;
+                case 3:
+                    winSequenceTimer.Interval = new TimeSpan(0, 0, 0, 0, 220);
+                    ButtonActivated(buttonBlue);
+                    break;
+                case 4:
+                    winSequenceTimer.Interval = new TimeSpan(0, 0, 0, 0, 130);
+                    ButtonActivated(buttonYellow);
+                    break;
+                case 5:
+                    winSequenceTimer.Interval = new TimeSpan(0, 0, 0, 0, 620);
+                    ButtonActivated(buttonBlue);
+                    break;
+            }
+            winSequenceIndex++;
+        }
+
+
 
         // button is pressed 
         private void ButtonActivated(System.Windows.Shapes.Path gameBoardButton)
@@ -560,10 +613,19 @@ namespace Simon
             timeToAddButton = false;
             // resets round index
             roundIndex = 0;
-
+    
             // increment currentRound
             currentRound++;
-           
+            // set the roundTimer's properties  - this is how long the cpu plays the button, 420 ms sequence length <=5, 320ms sequence length <=13, 220ms <=31
+
+            if (currentRound > 5 && currentRound < 14)
+            {
+                roundTimer.Interval = new TimeSpan(0, 0, 0, 0, 320);
+            }
+            if (currentRound >= 14 && currentRound <=31)
+            {
+                roundTimer.Interval = new TimeSpan(0, 0, 0, 0, 220);
+            }
 
             roundTimer.Start();
             ButtonActivated(randomPaths[roundIndex]);
@@ -862,7 +924,9 @@ namespace Simon
 
             if (won == true)
             {
+                playWinSequence();
                 MessageBox.Show("You've won!");
+                
             }
 
             else
@@ -873,10 +937,6 @@ namespace Simon
                 me.Position = new TimeSpan(0);
             }
 
-
-            
-            
-           
             SimonWindow.IsHitTestVisible = true;
 
         }
