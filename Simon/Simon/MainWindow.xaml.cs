@@ -853,7 +853,10 @@ namespace Simon
             if (lastPaths.Count > longestPaths.Count)
             {
                 longestPaths.Clear();
-                longestPaths = lastPaths;
+                for (int i = 0; i < lastPaths.Count; i++)
+                {
+                    longestPaths.Add(lastPaths[i]);
+                }
 
                 if (longestPaths.Count > MainSettings.LongestGame)
                 {
