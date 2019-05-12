@@ -25,7 +25,6 @@ namespace Simon
             InitializeComponent();
         }
 
-
         public Settings settingsWindowSettings = new Settings();
 
         // need this to prevent slider/radio button events from occuring while form is loading
@@ -70,7 +69,6 @@ namespace Simon
             if(settingsWindowSettings.BackGrndRGB)
             { rdoRGB.IsChecked = true; }
 
-
             //volume slider
             VolSlider.Value = Convert.ToDouble(settingsWindowSettings.VolumeSlider);
 
@@ -83,9 +81,7 @@ namespace Simon
 
         private void rdoBtn_Checked(object sender, RoutedEventArgs e)
         {
-           // if (formIsLoaded == true)
             {
-
                 if (rdoWood.IsChecked == true)
                 {
                     ((MainWindow)Application.Current.MainWindow).background.Background = ((MainWindow)Application.Current.MainWindow).woodBrush;
@@ -203,7 +199,6 @@ namespace Simon
             Keyboard.Focus(btnConfirmKeys);
         }
 
-
         private void VolSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             settingsWindowSettings.VolumeSlider = Convert.ToInt32(VolSlider.Value);
@@ -222,6 +217,5 @@ namespace Simon
         {
 
         }
-
     }
 }

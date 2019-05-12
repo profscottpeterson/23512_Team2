@@ -56,7 +56,6 @@ namespace Simon
         //For time between buttons in the win sequence
         DispatcherTimer winSequenceTimer = new DispatcherTimer();
 
-
         public int currentRound = 0;
         public int roundIndex = 0;
         // List used to fill with random paths for random sequence of lights
@@ -101,8 +100,7 @@ namespace Simon
         // Game running variables
         public bool gameActive = false;
         int maxRounds;
-        bool gameOver = false;
-        bool outcome = false;
+        bool gameIsOver = false;
 
         // The game slider value will be assigned to this when the start button is pressed
         int gameType = -1;
@@ -159,9 +157,7 @@ namespace Simon
                 SaveSettings();
             }
 
-
             //Now must set up all items based on what is loaded into class settings
-
             //set slider positions graphically
             gameSlider.Value = Convert.ToDouble(MainSettings.GameSlider);
             skillLevelSlider.Value = Convert.ToDouble(MainSettings.SkillLevelSlider);
@@ -182,15 +178,14 @@ namespace Simon
                 Color RGBBackground = Color.FromRgb(Convert.ToByte(MainSettings.RgbRedSlider), Convert.ToByte(MainSettings.RgbGreenSlider), Convert.ToByte(MainSettings.RgbBlueSlider));
                 rgbBrush.Color = RGBBackground;
                 background.Background = rgbBrush;
-            }
-           
+            }      
         }
 
         //Sets up the win sequence and plays it
         int winSequenceIndex = 0;
         public void playWinSequence()
         {
-            winSequenceTimer = new System.Windows.Threading.DispatcherTimer();
+            winSequenceTimer = new DispatcherTimer();
             winSequenceTimer.Tick += new EventHandler(winSequenceTimer_Tick);
             winSequenceTimer.Interval = new TimeSpan(0, 0, 0, 0, 220);
             winSequenceTimer.Start();
@@ -204,6 +199,8 @@ namespace Simon
             ButtonDeactivated(buttonBlue, false);
             ButtonDeactivated(buttonGreen, false);
             ButtonDeactivated(buttonRed, false);
+
+            SimonWindow.IsHitTestVisible = false;
 
             //plays the sequence... Feel free to customize 
             switch (winSequenceIndex)
@@ -233,8 +230,6 @@ namespace Simon
             winSequenceIndex++;
         }
 
-
-
         // button is pressed 
         private void ButtonActivated(System.Windows.Shapes.Path gameBoardButton)
         {
@@ -247,16 +242,13 @@ namespace Simon
                 RadialGradientBrush r = new RadialGradientBrush(greenPressed1, greenPressed2);
                 gameBoardButton.Fill = r;
                 me = buttonSounds[0];
-
             }
 
             if (gameBoardButton.Name == "buttonRed")
             {
                 RadialGradientBrush r = new RadialGradientBrush(redPressed1, redPressed2);
                 gameBoardButton.Fill = r;
-                me = buttonSounds[1];
-
-                
+                me = buttonSounds[1];          
             }
 
             if (gameBoardButton.Name == "buttonYellow")
@@ -264,7 +256,6 @@ namespace Simon
                 RadialGradientBrush r = new RadialGradientBrush(yellowPressed1, yellowPressed2);
                 gameBoardButton.Fill = r;
                 me = buttonSounds[2];
-
             }
 
             if (gameBoardButton.Name == "buttonBlue")
@@ -272,7 +263,6 @@ namespace Simon
                 RadialGradientBrush r = new RadialGradientBrush(bluePressed1, bluePressed2);
                 gameBoardButton.Fill = r;
                 me = buttonSounds[3];
-
             }
             me.Play();
         }
@@ -280,7 +270,6 @@ namespace Simon
         // button is released - called in event handlers mouse hovers off, mouse unclicked, key press up
         private void ButtonDeactivated(System.Windows.Shapes.Path gameBoardButton, bool humanInput)
         {
-
                 if (gameBoardButton.Name == "buttonGreen")
                 {
                     SolidColorBrush b = new SolidColorBrush(greenUnPressed);
@@ -291,7 +280,6 @@ namespace Simon
                     {
                         CheckCorrectButton("buttonGreen");
                     }
-
                 }
 
                 if (gameBoardButton.Name == "buttonRed")
@@ -304,7 +292,6 @@ namespace Simon
                     {
                         CheckCorrectButton("buttonRed");
                     }
-
                 }
 
                 if (gameBoardButton.Name == "buttonYellow")
@@ -317,7 +304,6 @@ namespace Simon
                     {
                         CheckCorrectButton("buttonYellow");
                     }
-
                 }
 
                 if (gameBoardButton.Name == "buttonBlue")
@@ -330,14 +316,12 @@ namespace Simon
                     {
                         CheckCorrectButton("buttonBlue");
                     }
-
                 }
 
                 if (gameActive == true & humanInput == true)
                 {
                     timeoutTimer.Stop();
-                    timeoutTimer.Start();
-                    
+                    timeoutTimer.Start();                
                 }
 
                 if (me != buttonSounds[4])
@@ -362,8 +346,7 @@ namespace Simon
 
             ButtonActivated(gameBoardButton);
 
-            btnHasBeenPressed = true;
-           
+            btnHasBeenPressed = true;          
         }
 
         // event handler for releasing mouse button
@@ -392,11 +375,12 @@ namespace Simon
             }       
         }
 
+
         // this is the event handler for key down
         private void ButtonPressed(object sender, KeyEventArgs e)
         {
             SimonWindow.IsHitTestVisible = false;
-            
+
             // if this if statment isn't here, the audio won't repeat
             if (!e.IsRepeat)
             {
@@ -420,6 +404,7 @@ namespace Simon
                     ButtonActivated(buttonBlue);
                 }
             }
+            
         }
 
         // This is the event handler for key up
@@ -427,26 +412,27 @@ namespace Simon
         {
             if (buttonHotKeys[0] == e.Key)
             {
-                ButtonDeactivated(buttonGreen,true);
+                ButtonDeactivated(buttonGreen, true);
             }
 
             if (buttonHotKeys[1] == e.Key)
             {
-                ButtonDeactivated(buttonRed,true);
+                ButtonDeactivated(buttonRed, true);
             }
 
             if (buttonHotKeys[2] == e.Key)
             {
-                ButtonDeactivated(buttonYellow,true);
+                ButtonDeactivated(buttonYellow, true);
             }
 
             if (buttonHotKeys[3] == e.Key)
             {
-                ButtonDeactivated(buttonBlue,true);
+                ButtonDeactivated(buttonBlue, true);
             }
-
             SimonWindow.IsHitTestVisible = true;
         }
+
+        
 
         private void GameSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -461,14 +447,6 @@ namespace Simon
         private void PwrSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MainSettings.PowerSlider = Convert.ToInt32(pwrSlider.Value);
-
-            // game turned on
-            if (MainSettings.PowerSlider == 1)
-            {
-                // game is turned on
-                // make lights flash?
-                // Start inactivity countdown - game flashes  if left on for over 45s
-            }
         }
 
         // ------------------------------------------------------------------------------------------------
@@ -480,28 +458,26 @@ namespace Simon
         // Start the game - set up variables based on slider positions
         private void btnStartGame_Click(object sender, MouseButtonEventArgs e)
         {
+            pwrSlider.Value = 1;
+
             greenIsPlaying = true;
             blueIsPlaying = true;
             redIsPlaying = true;
             yellowIsPlaying = true;
 
-            
-
             gameActive = true;
+            gameIsOver = false;
             btnStart.IsEnabled = false;
 
             randomPaths = new List<Path>();
+            randomPaths2 = new List<Path>();
             roundTimer = new DispatcherTimer();
             delaytimer = new DispatcherTimer();
             TimertoWaitForNextSequence = new DispatcherTimer();
-
-            // time-out timer
             timeoutTimer = new DispatcherTimer();
 
             currentRound = 0;
 
-            
-            
             roundIndex = 0;
             timeoutTimer.Stop();
             roundTimer.Stop();
@@ -511,7 +487,6 @@ namespace Simon
             // set the roundTimer's properties  - this is how long the cpu plays the button, 420 ms sequence length <=5, 320ms sequence length <=13, 220ms <=31
             roundTimer.Tick += new EventHandler(roundTimer_Tick);
             roundTimer.Interval = new TimeSpan(0, 0, 0, 0, 420);
-
 
             delaytimer.Tick += new EventHandler(delayTimer_Tick);
             delaytimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
@@ -566,7 +541,6 @@ namespace Simon
                 randomPaths.Add(p);
             }
 
-
             if(gameType==2)
 
             {
@@ -605,12 +579,10 @@ namespace Simon
             return m;
         }
 
-        bool timeToAddButton;
         // code that runs during each round
         public void Round()
         {
             SimonWindow.IsHitTestVisible = false;
-            timeToAddButton = false;
             // resets round index
             roundIndex = 0;
     
@@ -636,9 +608,7 @@ namespace Simon
             roundTimer.Stop();
             if (randomPaths[roundIndex]!=null)
             {
-                ButtonDeactivated(randomPaths[roundIndex], false);
-                timeToAddButton = true;
-                
+                ButtonDeactivated(randomPaths[roundIndex], false);       
             }
             timeoutTimer.Start();
             roundIndex++;
@@ -654,13 +624,13 @@ namespace Simon
             if (roundIndex != currentRound)
             {
                 roundTimer.Start();
-                try { 
-               if (randomPaths[roundIndex] != null)
+                try
                 {
-                    ButtonActivated(randomPaths[roundIndex]);
-                    timeToAddButton = true;
-                }
-                timeoutTimer.Stop();
+                    if (randomPaths[roundIndex] != null)
+                    {
+                        ButtonActivated(randomPaths[roundIndex]);
+                    }
+                    timeoutTimer.Stop();
                 }
                 catch
                 {
@@ -684,6 +654,7 @@ namespace Simon
         public void CheckCorrectButton(string b)
         {
             bool nextRoundBegun = false;
+            SimonWindow.IsHitTestVisible = false;
 
             if (gameType == 2)
             {
@@ -691,104 +662,104 @@ namespace Simon
                 path.Name = "Add";
                 randomPaths[randomPaths.Count - 1] = path;
             }
-            
-                if (b == randomPaths[roundIndex].Name)
-                {
-                    roundIndex++;
+
+            if (b == randomPaths[roundIndex].Name)
+            {
+                SimonWindow.IsHitTestVisible = true;
+                roundIndex++;
+
                 if (gameType == 2)
                 {
                     if (roundIndex == maxRounds - 1)
                     { GameOver(true); }
                 }
+            }
 
-                }
+            else
+            {
+                int numColorsRemaining = 0;
 
-                else
+                if (gameType == 3)
                 {
-                    int numColorsRemaining = 0;
+                    if (b == "buttonGreen")
+                    { greenIsPlaying = false; }
+                    if (b == "buttonRed")
+                    { redIsPlaying = false; }
+                    if (b == "buttonYellow")
+                    { yellowIsPlaying = false; }
+                    if (b == "buttonBlue")
+                    { blueIsPlaying = false; }
 
-                    if (gameType == 3)
+
+                    if (greenIsPlaying == true)
+                    { numColorsRemaining++; }
+                    if (redIsPlaying == true)
+                    { numColorsRemaining++; }
+                    if (yellowIsPlaying == true)
+                    { numColorsRemaining++; }
+                    if (blueIsPlaying == true)
+                    { numColorsRemaining++; }
+
+                    if (numColorsRemaining < 2)
+                    { GameOver(false); }
+
+                    Random rand = new Random();
+
+                    randomPaths2.Clear();
+                    //create list of random paths to be passed into button pressed/button released methods
+                    while (randomPaths2.Count < maxRounds)
                     {
-                        if (b == "buttonGreen")
-                        { greenIsPlaying = false; }
-                        if (b == "buttonRed")
-                        { redIsPlaying = false; }
-                        if (b == "buttonYellow")
-                        { yellowIsPlaying = false; }
-                        if (b == "buttonBlue")
-                        { blueIsPlaying = false; }
+                        bool pathSuccess = false;
 
+                        Path p = new Path();
 
-                        if (greenIsPlaying == true)
-                        { numColorsRemaining++; }
-                        if (redIsPlaying == true)
-                        { numColorsRemaining++; }
-                        if (yellowIsPlaying == true)
-                        { numColorsRemaining++; }
-                        if (blueIsPlaying == true)
-                        { numColorsRemaining++; }
+                        int tempRandom = rand.Next(0, 4);
 
-                        if (numColorsRemaining < 2)
-                        { GameOver(false); }
-
-                        Random rand = new Random();
-
-                        randomPaths2.Clear();
-                        //create list of random paths to be passed into button pressed/button released methods
-                        while (randomPaths2.Count < maxRounds)
+                        if (tempRandom == 0 & greenIsPlaying)
                         {
-                            bool pathSuccess = false;
-
-                            Path p = new Path();
-
-                            int tempRandom = rand.Next(0, 4);
-
-                            if (tempRandom == 0 & greenIsPlaying)
-                            {
-                                p = buttonGreen;
-                                pathSuccess = true;
-                            }
-
-                            if (tempRandom == 1 & redIsPlaying)
-                            {
-                                p = buttonRed;
-                                pathSuccess = true;
-                            }
-
-                            if (tempRandom == 2 & yellowIsPlaying)
-                            {
-                                p = buttonYellow;
-                                pathSuccess = true;
-                            }
-
-                            if (tempRandom == 3 & blueIsPlaying)
-                            {
-                                p = buttonBlue;
-                                pathSuccess = true;
-                            }
-
-                            if (pathSuccess == true)
-                            {
-                                randomPaths2.Add(p);
-                            }
+                            p = buttonGreen;
+                            pathSuccess = true;
                         }
 
-                        randomPaths = randomPaths2;
+                        if (tempRandom == 1 & redIsPlaying)
+                        {
+                            p = buttonRed;
+                            pathSuccess = true;
+                        }
 
-                        currentRound--;
+                        if (tempRandom == 2 & yellowIsPlaying)
+                        {
+                            p = buttonYellow;
+                            pathSuccess = true;
+                        }
 
-                        TimertoWaitForNextSequence.Stop();
+                        if (tempRandom == 3 & blueIsPlaying)
+                        {
+                            p = buttonBlue;
+                            pathSuccess = true;
+                        }
 
-                        TimertoWaitForNextSequence.Start();
-
-                        nextRoundBegun = true;
+                        if (pathSuccess == true)
+                        {
+                            randomPaths2.Add(p);
+                        }
                     }
-                    
 
-                    if (gameType != 3)
-                    {
+                    randomPaths = randomPaths2;
 
-                    if (b != randomPaths[roundIndex].Name  & randomPaths[roundIndex].Name!="Add")
+                    currentRound--;
+
+                    TimertoWaitForNextSequence.Stop();
+
+                    TimertoWaitForNextSequence.Start();
+
+                    nextRoundBegun = true;
+                }
+
+                if (gameType != 3)
+                {
+
+                    if (b != randomPaths[roundIndex].Name & randomPaths[roundIndex].Name != "Add")
 
                     {
                         // game over(false) means you lost, true means you won
@@ -796,61 +767,59 @@ namespace Simon
                     }
 
                     if (randomPaths[randomPaths.Count - 1].Name == "Add")
-                        {
-                            Path p = new Path();
-                            if (b == "buttonGreen")
-                            { p = buttonGreen; }
-                            if (b == "buttonRed")
-                            { p = buttonRed; }
-                            if (b == "buttonYellow")
-                            { p = buttonYellow; }
-                            if (b == "buttonBlue")
-                            { p = buttonBlue; }
+                    {
+                        Path p = new Path();
+                        if (b == "buttonGreen")
+                        { p = buttonGreen; }
+                        if (b == "buttonRed")
+                        { p = buttonRed; }
+                        if (b == "buttonYellow")
+                        { p = buttonYellow; }
+                        if (b == "buttonBlue")
+                        { p = buttonBlue; }
 
-                            randomPaths.Insert(randomPaths.Count - 1, p);
-                            roundIndex++;
+                        randomPaths.Insert(randomPaths.Count - 1, p);
+                        roundIndex++;
 
 
-                            randomPaths.RemoveAt(randomPaths.Count - 1);
-                            p = null;
-                            randomPaths.Add(p);                    
-                        }
+                        randomPaths.RemoveAt(randomPaths.Count - 1);
+                        p = null;
+                        randomPaths.Add(p);
                     }
                 }
-            
+            }
 
             if (roundIndex == currentRound)
             {
                 if (nextRoundBegun == false)
                 {
-                    
-
-
                     TimertoWaitForNextSequence.Start();
 
+                    SimonWindow.IsHitTestVisible = false;
 
-
+                    if (gameIsOver == true)
+                    {
+                        SimonWindow.IsHitTestVisible = true;
+                    }
                 }
             }
         }
 
         private void TimertoWaitForNextSequence_Tick(object sender, EventArgs e)
         {
+
+            SimonWindow.IsHitTestVisible = true;
             if (currentRound < maxRounds)
             {
                 TimertoWaitForNextSequence.Stop();
-                Round();
-               
+                Round(); 
             }
-
             else
             {
                 TimertoWaitForNextSequence.Stop();
                 GameOver(true);
-            }
-           
+            }   
         }
-
 
         // method that holds the game over code
         public void GameOver(bool won)
@@ -868,22 +837,25 @@ namespace Simon
             // add to list of last paths
             for (int i = 0; i < currentRound; i++)
             {
-
-                if (randomPaths[i] != null & randomPaths[i].Name!="Add")
+                try
                 {
-                    lastPaths.Add(randomPaths[i]);
+                    if (randomPaths[i] != null & randomPaths[i].Name != "Add")
+                    {
+                        lastPaths.Add(randomPaths[i]);
+                    }
+                }
+                catch
+                {
+                    break;
                 }
             }
 
             if (lastPaths.Count > longestPaths.Count)
             {
                 longestPaths.Clear();
-                for (int i = 0; i < currentRound; i++)
-                {
-                    longestPaths.Add(randomPaths[i]);
-                }
+                longestPaths = lastPaths;
 
-                if(longestPaths.Count>MainSettings.LongestGame)
+                if (longestPaths.Count > MainSettings.LongestGame)
                 {
                     MainSettings.LongestGame = longestPaths.Count;
                 }
@@ -919,16 +891,17 @@ namespace Simon
             TimertoWaitForNextSequence = new DispatcherTimer();
 
             // disable all buttons <-- Do we want to do something like this? 
-
-            
-
             if (won == true)
             {
                 playWinSequence();
                 MessageBox.Show("You've won!");
-                
-            }
 
+                winSequenceTimer.Stop();
+                winSequenceTimer.Tick -= winSequenceTimer_Tick;
+                winSequenceTimer = null;
+                winSequenceIndex = 0;
+
+            }
             else
             {
                 //game over sound.  Might need to be set on a timer. For this, I guess I could just recreate the audio file for the exact time length
@@ -936,9 +909,10 @@ namespace Simon
                 me.Play();
                 me.Position = new TimeSpan(0);
             }
-
             SimonWindow.IsHitTestVisible = true;
+            gameIsOver = true;
 
+            
         }
 
         // ------------------------------------------------------------------------------------------------
@@ -946,8 +920,6 @@ namespace Simon
         // GAME RUNNING CODE ABOVE THIS POINT
         // ------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------
-
-
 
         //  open the settings window when clicked
         private void settings_Click(object sender, RoutedEventArgs e)
@@ -1030,7 +1002,6 @@ namespace Simon
 
             sw.Flush();
             sw.Close();
-
         }
 
         private void LoadSettings()
@@ -1155,7 +1126,6 @@ namespace Simon
         {
             if (lastPaths.Count > 0)
             {
-
                 SimonWindow.IsHitTestVisible = false;
 
                 roundTimerLast = new DispatcherTimer();
@@ -1167,15 +1137,12 @@ namespace Simon
                 roundTimerLast.Stop();
                 delaytimerLast.Stop();
 
-
                 // set the roundTimer's properties  - this is how long the cpu plays the button, 420 ms sequence length <=5, 320ms sequence length <=13, 220ms <=31
                 roundTimerLast.Tick += new EventHandler(roundTimerLast_Tick);
                 roundTimerLast.Interval = new TimeSpan(0, 0, 0, 0, 420);
 
-
                 delaytimerLast.Tick += new EventHandler(delayTimerLast_Tick);
                 delaytimerLast.Interval = new TimeSpan(0, 0, 0, 0, 50);
-
 
                 // get the max number of possible rounds, store it in the global variable 
                 maxRounds = lastPaths.Count;
@@ -1232,10 +1199,7 @@ namespace Simon
                 delaytimerLast = null;
                 SimonWindow.IsHitTestVisible = true;
             }
-
         }
-
-
 
         DispatcherTimer roundTimerLongest = new DispatcherTimer();
         DispatcherTimer delaytimerLongest = new DispatcherTimer();
@@ -1272,8 +1236,6 @@ namespace Simon
                 RoundLongest();
             }
         }
-
-
 
         // code that runs during each round
         public void RoundLongest()
